@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+:root {
+  /* Dark theme - near-black background */
+  --background: #0a0f1a;
+  --surface: #131b2e;
+  --foreground: #e8eaed;
+
+  /* Primary accent - vivid cyan/teal for EtherFi */
+  --primary: #00d4ff;
+  --primary-dark: #00a8cc;
+  --primary-light: #33ddff;
+
+  /* Status colors */
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --error: #ef4444;
+
+  /* Claude hint color - subtle lavender */
+  --claude: #c4b5fd;
+  --claude-bg: #312e81;
+
+  /* Spacing base unit */
+  --spacing-base: 8px;
+
+  /* Border radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+}
+
+@theme inline {
+  /* Colors */
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-light: var(--primary-light);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-claude: var(--claude);
+  --color-claude-bg: var(--claude-bg);
+
+  /* Fonts */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Spacing scale (8px base) */
+  --spacing-1: calc(var(--spacing-base) * 1);
+  --spacing-2: calc(var(--spacing-base) * 2);
+  --spacing-3: calc(var(--spacing-base) * 3);
+  --spacing-4: calc(var(--spacing-base) * 4);
+  --spacing-6: calc(var(--spacing-base) * 6);
+  --spacing-8: calc(var(--spacing-base) * 8);
+
+  /* Border radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+
+  /* Transitions */
+  --transition-fast: 150ms ease-in-out;
+  --transition-base: 200ms ease-in-out;
+  --transition-slow: 250ms ease-in-out;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  font-feature-settings: "tnum" 1; /* Tabular numerals for consistent number width */
+  line-height: 1.6;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-dark);
+}
