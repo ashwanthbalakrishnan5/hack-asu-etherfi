@@ -18,21 +18,17 @@ export async function POST(request: NextRequest) {
 
     const normalizedAddress = address.toLowerCase();
 
-    // Get or create user
-    let user = await prisma.user.findUnique({
+    // Get or create user using upsert to avoid race conditions
+    let user = await prisma.user.upsert({
       where: { address: normalizedAddress },
+      update: {},
+      create: {
+        address: normalizedAddress,
+        ycBalance: 0,
+        principal: 0,
+        lastAccrualTime: new Date(),
+      },
     });
-
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          address: normalizedAddress,
-          ycBalance: 0,
-          principal: 0,
-          lastAccrualTime: new Date(),
-        },
-      });
-    }
 
     // TODO: Implement actual payment verification (crypto payment)
     // For demo, we'll just add the credits

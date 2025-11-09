@@ -5,16 +5,11 @@ import { Card, Button } from '@/components/ui';
 import {
   Bot,
   Zap,
-  TrendingUp,
   Activity,
   Settings,
   Play,
   Pause,
-  Target,
-  Flame,
-  Crown,
   Sparkles,
-  ChevronRight
 } from 'lucide-react';
 import { useAccount } from 'wagmi';
 import { toast } from '@/lib/stores/toast';
@@ -204,30 +199,6 @@ export function GameModePanel() {
       </div>
 
       <AnimatePresence mode="wait">
-        {/* Manual Mode View */}
-        {gameMode === 'manual' && (
-          <motion.div
-            key="manual"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2 }}
-          >
-            <Card className="bg-gradient-to-br from-primary/5 to-transparent border-primary/20">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Flame className="w-5 h-5 text-orange-400" />
-                  <span className="font-bold text-foreground">Manual Mode Active</span>
-                </div>
-                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
-                  <Crown className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-semibold text-primary">You Control</span>
-                </div>
-              </div>
-            </Card>
-          </motion.div>
-        )}
-
         {/* Automated Mode View */}
         {gameMode === 'automated' && (
           <motion.div

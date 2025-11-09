@@ -18,21 +18,17 @@ export async function GET(request: NextRequest) {
 
     const normalizedAddress = address.toLowerCase();
 
-    // Get or create user
-    let user = await prisma.user.findUnique({
+    // Get or create user using upsert to avoid race conditions
+    const user = await prisma.user.upsert({
       where: { address: normalizedAddress },
+      update: {},
+      create: {
+        address: normalizedAddress,
+        ycBalance: 1000,
+        principal: 0,
+        lastAccrualTime: new Date(),
+      },
     });
-
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          address: normalizedAddress,
-          ycBalance: 1000,
-          principal: 0,
-          lastAccrualTime: new Date(),
-        },
-      });
-    }
 
     // Check last claim time (stored in user metadata - you may want to add a field to schema)
     // For demo, we'll use createdAt as reference
