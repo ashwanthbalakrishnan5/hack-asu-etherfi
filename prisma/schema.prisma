@@ -61,6 +61,7 @@ model Position {
 model Quest {
   id              String   @id @default(uuid())
   userId          String
+  marketId        String?
   title           String
   question        String
   suggestedStake  Float
@@ -70,10 +71,13 @@ model Quest {
   accepted        Boolean  @default(false)
   completed       Boolean  @default(false)
   outcome         String?
+  feedback        String?
+  suggestion      String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
   @@index([userId])
+  @@index([marketId])
 }
 
 model Achievement {

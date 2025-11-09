@@ -991,7 +991,7 @@ This plan breaks down the entire project into 6 logical phases, each building up
 - [x] Phase 1: Wallet Integration & Basic UI Shell
 - [x] Phase 2: Smart Contracts & Vault Integration
 - [x] Phase 3: Markets & Prediction Gameplay
-- [ ] Phase 4: Claude Quests & Adaptive Gameplay
+- [x] Phase 4: Claude Quests & Adaptive Gameplay
 - [ ] Phase 5: Player Progression & Social Features
 - [ ] Phase 6: Portfolio Analytics & Final Polish
 - [ ] Post-Launch: Future Enhancements (Not in MVP)
@@ -1021,11 +1021,27 @@ This plan breaks down the entire project into 6 logical phases, each building up
 - Toast store: use toast.success/error (not useToast hook)
 - XP system: +10 bet, +20 win, +50 streak
 - User stats (wins, losses, accuracy) tracked in users table
+- Tooltip component: uses isMounted check to prevent hydration issues, properly cleans up setTimeout
+- Web3Provider: QueryClient uses useState with lazy initialization for stability across renders
 
-**Phase 4 Requirements:**
+**Phase 4 - Claude Quests Implementation:**
 
-- Create quest generation API using Claude (return 3 quests as JSON)
-- Build QuestCard and QuestsPanel UI components
-- Add quest acceptance flow (links to markets, pre-fills bet)
-- Implement post-resolution feedback from Claude
-- Track quest completion in database
+- Quest generation API (/api/quests/generate): Generates 3 personalized quests with adaptive difficulty
+- Quest acceptance API (/api/quests/accept): Creates/links markets, marks quest as accepted
+- Quest feedback API (/api/quests/feedback): Generates post-resolution educational feedback using Claude
+- Quest user API (/api/quests/user): Fetches user's quest history
+- QuestCard, QuestsPanel, QuestFeedbackModal, QuestHistory UI components
+- Quest tracking on profile page with status indicators (Generated, In Progress, Completed)
+- XP rewards: +30 XP for completing quests
+- Adaptive difficulty: >70% accuracy = harder quests (4-5), <50% = easier (1-3)
+- Quest schema: includes marketId, feedback, suggestion fields
+
+**Phase 5 Requirements:**
+
+- Implement XP and leveling system (level = floor(sqrt(xp / 100)))
+- Create achievement system with 7 core achievements (First Bet, Hat Trick, Sharpshooter, etc.)
+- Build achievement badges with NFT-ready designs
+- Add accuracy, yield efficiency, and wisdom index calculations
+- Create leaderboard with three tabs (Accuracy, Wisdom Index, Quest Masters)
+- Build profile page with stats, achievements grid, and history timeline
+- Implement class badges (Oracle, Degen, Analyst, Whale)
