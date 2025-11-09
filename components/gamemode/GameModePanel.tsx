@@ -214,31 +214,14 @@ export function GameModePanel() {
             transition={{ duration: 0.2 }}
           >
             <Card className="bg-gradient-to-br from-primary/5 to-transparent border-primary/20">
-              <div className="space-y-4">
-                {/* Header */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Flame className="w-5 h-5 text-orange-400" />
-                    <span className="font-bold text-foreground">Manual Mode</span>
-                  </div>
-                  <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
-                    <Crown className="w-4 h-4 text-primary" />
-                    <span className="text-sm font-semibold text-primary">Full Control</span>
-                  </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Flame className="w-5 h-5 text-orange-400" />
+                  <span className="font-bold text-foreground">Manual Mode Active</span>
                 </div>
-
-                {/* Quick Stats */}
-                <div className="text-sm text-foreground/70">
-                  Browse markets below and place your bets. Build win streaks for bonus rewards!
-                </div>
-
-                {/* Action Prompt */}
-                <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/5 border border-primary/20">
-                  <Target className="w-4 h-4 text-primary flex-shrink-0" />
-                  <div className="text-sm text-foreground/80">
-                    Scroll down to see live markets and start betting
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-primary ml-auto" />
+                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+                  <Crown className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-semibold text-primary">You Control</span>
                 </div>
               </div>
             </Card>

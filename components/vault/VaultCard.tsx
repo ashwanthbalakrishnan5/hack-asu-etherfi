@@ -8,6 +8,7 @@ import { useVault, useYieldCredits } from "@/lib/hooks";
 import { DepositModal } from "./DepositModal";
 import { WithdrawModal } from "./WithdrawModal";
 import { YCMeter } from "./YCMeter";
+import { DailyBonusCard } from "./DailyBonusCard";
 import { config } from "@/lib/config";
 
 export function VaultCard() {
@@ -128,6 +129,11 @@ export function VaultCard() {
             </Tooltip>
           </div>
         </motion.div>
+
+        {/* Daily Bonus */}
+        <div className="mb-5">
+          <DailyBonusCard />
+        </div>
 
         {/* Info Footer */}
         <div className="rounded-xl bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 border border-surface-elevated/30 p-4">

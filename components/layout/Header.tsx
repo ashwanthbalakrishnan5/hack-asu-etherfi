@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { WalletButton } from "@/components/wallet/WalletButton";
 import { Button } from "@/components/ui";
+import { CreditsWidget } from "@/components/credits";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -54,8 +55,9 @@ export function Header() {
           })}
         </nav>
 
-        {/* Wallet Button */}
-        <div className="hidden md:block">
+        {/* Credits & Wallet */}
+        <div className="hidden md:flex items-center gap-3">
+          <CreditsWidget />
           <WalletButton />
         </div>
 

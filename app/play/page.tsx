@@ -102,18 +102,9 @@ export default function PlayPage() {
 
             {/* Active Markets */}
             <div className="min-w-0">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                <h3 className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground-muted bg-clip-text text-transparent">
-                  Prediction Markets
-                </h3>
-                <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/30 backdrop-blur-sm">
-                  <div className="text-xs text-foreground-muted">Your YC Balance</div>
-                  <div className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                    {Number(ycBalance).toFixed(2)}
-                  </div>
-                  <div className="text-sm text-foreground-muted font-medium">YC</div>
-                </div>
-              </div>
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground-muted bg-clip-text text-transparent mb-6">
+                Live Markets
+              </h3>
               <MarketsList key={refreshKey} onPlaceBet={handlePlaceBet} />
             </div>
 
