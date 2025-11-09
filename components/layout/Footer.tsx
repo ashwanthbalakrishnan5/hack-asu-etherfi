@@ -33,7 +33,7 @@ export function Footer() {
 
           {/* Copyright */}
           <p className="text-sm text-foreground/60">
-            © 2025 EtherFi Predictions. Demo only.
+            © {new Date().getFullYear()} EtherFi Predictions. Demo only.
           </p>
         </div>
       </div>

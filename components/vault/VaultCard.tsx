@@ -7,6 +7,7 @@ import { useVault, useYieldCredits } from "@/lib/hooks";
 import { DepositModal } from "./DepositModal";
 import { WithdrawModal } from "./WithdrawModal";
 import { YCMeter } from "./YCMeter";
+import { config } from "@/lib/config";
 
 export function VaultCard() {
   const { principalBalance } = useVault();
@@ -14,7 +15,7 @@ export function VaultCard() {
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
 
-  const apr = process.env.NEXT_PUBLIC_SIMULATED_APR || "5";
+  const apr = config.simulatedAPR;
 
   return (
     <>

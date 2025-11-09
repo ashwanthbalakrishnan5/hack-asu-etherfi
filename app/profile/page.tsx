@@ -152,12 +152,16 @@ export default function ProfilePage() {
             <div className="flex items-center gap-4">
               {/* Avatar placeholder */}
               <div className="h-20 w-20 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-2xl font-bold text-white">
-                {profile.displayName?.[0]?.toUpperCase() || (address ? address[2].toUpperCase() : '?')}
+                {profile.displayName
+                  ? profile.displayName[0].toUpperCase()
+                  : address && address.length > 2
+                    ? address[2].toUpperCase()
+                    : '?'}
               </div>
 
               <div>
                 <h2 className="text-2xl font-bold text-foreground">
-                  {profile.displayName || (address ? shortenAddress(address) : 'Unknown')}
+                  {profile.displayName || (address ? shortenAddress(address) : 'Unknown User')}
                 </h2>
                 {profile.displayName && address && (
                   <p className="text-sm text-foreground/70">
