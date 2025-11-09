@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowDownToLine, ArrowUpFromLine, Shield, TrendingUp } from "lucide-react";
+import { ArrowDownToLine, ArrowUpFromLine, Shield, TrendingUp, Info } from "lucide-react";
 import { Card, Button, Badge, Tooltip } from "@/components/ui";
 import { useVault, useYieldCredits } from "@/lib/hooks";
 import { DepositModal } from "./DepositModal";
 import { WithdrawModal } from "./WithdrawModal";
 import { YCMeter } from "./YCMeter";
+import { config } from "@/lib/config";
 
 export function VaultCard() {
   const { principalBalance } = useVault();
@@ -14,7 +15,7 @@ export function VaultCard() {
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
 
-  const apr = process.env.NEXT_PUBLIC_SIMULATED_APR || "5";
+  const apr = config.simulatedAPR;
 
   return (
     <>
@@ -88,9 +89,7 @@ export function VaultCard() {
             <div className="flex items-center gap-2">
               <span className="font-semibold text-primary">{apr}%</span>
               <Tooltip content="This is a simulated APR for demo purposes. Real APR varies based on market conditions.">
-                <span className="cursor-help text-xs text-foreground/60">
-                  ℹ️
-                </span>
+                <Info className="w-4 h-4 text-foreground/60 cursor-help" />
               </Tooltip>
             </div>
           </div>

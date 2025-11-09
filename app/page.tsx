@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Coins, TrendingUp, Trophy, Wallet } from "lucide-react";
+import { ArrowRight, Coins, TrendingUp, Trophy, Wallet, Info } from "lucide-react";
 import { Button, Card, Tooltip } from "@/components/ui";
 import { useAccount } from "wagmi";
 import { WalletButton } from "@/components/wallet/WalletButton";
@@ -127,7 +127,7 @@ export default function Home() {
                 <span className="text-lg font-bold text-background">Ξ</span>
               </div>
               <Tooltip content="Your principal earns real yield through EtherFi's weETH liquid staking">
-                <span className="text-xs text-foreground/60">ℹ️</span>
+                <Info className="w-4 h-4 text-foreground/60 cursor-help" />
               </Tooltip>
             </div>
             <h3 className="mb-2 text-xl font-semibold text-foreground">
@@ -145,7 +145,7 @@ export default function Home() {
                 <span className="text-lg font-bold text-background">C</span>
               </div>
               <Tooltip content="Claude adapts difficulty and provides personalized learning insights">
-                <span className="text-xs text-foreground/60">ℹ️</span>
+                <Info className="w-4 h-4 text-foreground/60 cursor-help" />
               </Tooltip>
             </div>
             <h3 className="mb-2 text-xl font-semibold text-foreground">

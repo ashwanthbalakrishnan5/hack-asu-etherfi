@@ -62,7 +62,7 @@ export function MarketCard({ market, onPlaceBet }: MarketCardProps) {
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
-          <h3 className="text-lg font-semibold text-white mb-2 line-clamp-2">
+          <h3 className="text-lg font-semibold text-foreground mb-2 line-clamp-2">
             {market.question}
           </h3>
           <div className="flex items-center gap-2 flex-wrap">

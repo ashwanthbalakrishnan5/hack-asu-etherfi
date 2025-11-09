@@ -6,6 +6,7 @@ import { X, TrendingUp, TrendingDown, Sparkles, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAccount } from 'wagmi';
 import { formatDistanceToNow } from 'date-fns';
+import { toast } from '@/lib/stores/toast';
 
 interface BetTicketProps {
   market: Market | null;
@@ -129,11 +130,9 @@ export function BetTicket({
       }
 
       // Success!
+      toast.success(`Bet placed successfully! ${betAmount.toFixed(2)} YC on ${side}`);
       onBetPlaced?.();
       onClose();
-
-      // Show success toast (you can add a toast library later)
-      console.log('Bet placed successfully!', data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to place bet');
     } finally {
@@ -263,9 +262,14 @@ export function BetTicket({
                 <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm text-gray-400">Expected Payout</span>
-                    <span className="text-lg font-bold text-cyan-400">
-                      {expectedPayout.toFixed(2)} YC
-                    </span>
+                    <div className="text-right">
+                      <span className="text-lg font-bold text-cyan-400">
+                        {expectedPayout.toFixed(2)} YC
+                      </span>
+                      <span className="ml-2 text-xs text-cyan-400/70">
+                        ({(expectedPayout / (parseFloat(amount) || 1)).toFixed(2)}x)
+                      </span>
+                    </div>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-400">Potential Profit</span>

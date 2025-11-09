@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { WalletButton } from "@/components/wallet/WalletButton";
 import { Button } from "@/components/ui";
@@ -15,6 +16,7 @@ const navLinks = [
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-surface bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -31,15 +33,25 @@ export function Header() {
 
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-6 md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
-            >
-              {link.label}
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const isActive = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`text-sm font-medium transition-colors hover:text-foreground relative ${
+                  isActive
+                    ? "text-primary"
+                    : "text-foreground/80"
+                }`}
+              >
+                {link.label}
+                {isActive && (
+                  <span className="absolute -bottom-[17px] left-0 right-0 h-0.5 bg-primary" />
+                )}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Wallet Button */}
@@ -62,16 +74,21 @@ export function Header() {
       {mobileMenuOpen && (
         <div className="border-t border-surface bg-background md:hidden">
           <nav className="container mx-auto flex flex-col gap-4 px-4 py-4">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`text-sm font-medium transition-colors hover:text-foreground ${
+                    isActive ? "text-primary" : "text-foreground/80"
+                  }`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
             <div className="pt-2">
               <WalletButton />
             </div>

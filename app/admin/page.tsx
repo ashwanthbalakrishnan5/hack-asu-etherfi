@@ -11,14 +11,22 @@ export default function AdminPage() {
   const [markets, setMarkets] = useState<Market[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  const isAdmin = config.adminAddresses.includes(address?.toLowerCase() || '');
+  // Prevent hydration mismatch by checking admin status only on client
+  useEffect(() => {
+    setMounted(true);
+    if (address) {
+      setIsAdmin(config.adminAddresses.includes(address.toLowerCase()));
+    }
+  }, [address]);
 
   useEffect(() => {
-    if (address && isAdmin) {
+    if (address && isAdmin && mounted) {
       fetchMarkets();
     }
-  }, [address, isAdmin]);
+  }, [address, isAdmin, mounted]);
 
   const fetchMarkets = async () => {
     try {
@@ -34,6 +42,18 @@ export default function AdminPage() {
       setLoading(false);
     }
   };
+
+  // Show loading state until mounted to prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex items-center justify-center p-6">
+        <div className="bg-gray-800 rounded-lg p-8 text-center border border-gray-700">
+          <Loader2 className="w-8 h-8 text-cyan-400 animate-spin mx-auto mb-4" />
+          <p className="text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!address) {
     return (
@@ -51,7 +71,9 @@ export default function AdminPage() {
       <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex items-center justify-center p-6">
         <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-8 text-center">
           <h1 className="text-2xl font-bold text-red-400 mb-4">Access Denied</h1>
-          <p className="text-gray-400">You do not have permission to access this page.</p>
+          <p className="text-gray-400 mb-4">You do not have permission to access this page.</p>
+          <p className="text-sm text-gray-500">Connected wallet: {address}</p>
+          <p className="text-sm text-gray-500 mt-2">Add your address to NEXT_PUBLIC_ADMIN_ADDRESSES in .env.local</p>
         </div>
       </div>
     );
