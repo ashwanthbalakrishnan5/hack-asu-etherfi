@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: "default" | "success" | "warning" | "error" | "primary" | "safe" | "gradient";
@@ -18,7 +17,7 @@ export function Badge({
   ...props
 }: BadgeProps) {
   const baseStyles =
-    "inline-flex items-center justify-center font-semibold rounded-full transition-all duration-300 backdrop-blur-sm";
+    "inline-flex items-center justify-center font-semibold rounded-full transition-all duration-300 backdrop-blur-sm animate-in fade-in zoom-in-95";
 
   const variants = {
     default: "bg-surface-elevated/70 text-foreground border border-surface-elevated",
@@ -55,13 +54,11 @@ export function Badge({
   };
 
   return (
-    <motion.span
-      initial={{ scale: 0.9, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
+    <span
       className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${glowStyles[variant]} ${className}`}
       {...props}
     >
       {children}
-    </motion.span>
+    </span>
   );
 }

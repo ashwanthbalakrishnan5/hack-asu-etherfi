@@ -83,7 +83,7 @@ export function VaultCard() {
               </Button>
               <Button
                 size="sm"
-                variant="default"
+                variant="secondary"
                 onClick={() => setShowWithdrawModal(true)}
                 className="flex-1 gap-2"
                 disabled={parseFloat(principalBalance) === 0}

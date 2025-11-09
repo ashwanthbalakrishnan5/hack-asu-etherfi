@@ -206,7 +206,7 @@ export function QuestHistory() {
                         Outcome:{" "}
                         <Badge
                           variant={
-                            quest.outcome === "YES" ? "success" : "secondary"
+                            quest.outcome === "YES" ? "success" : "default"
                           }
                           className="text-xs"
                         >
@@ -229,7 +229,7 @@ export function QuestHistory() {
                 {quest.accepted && quest.marketId && quest.outcome && (
                   <Button
                     size="sm"
-                    variant="default"
+                    variant="secondary"
                     onClick={() => handleViewFeedback(quest)}
                     disabled={isLoadingFeedback}
                     className="mt-2 gap-2"

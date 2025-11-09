@@ -1,13 +1,14 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, HTMLMotionProps } from "framer-motion";
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends Omit<HTMLMotionProps<"button">, "children"> {
   variant?: "primary" | "secondary" | "subtle" | "gradient";
   size?: "sm" | "md" | "lg";
   loading?: boolean;
   withGlow?: boolean;
+  children?: React.ReactNode;
 }
 
 export function Button({

@@ -74,7 +74,7 @@ export default function Home() {
               <WalletButton />
             )}
             <Link href="/leaderboard">
-              <Button variant="default" size="lg" className="gap-2">
+              <Button variant="secondary" size="lg" className="gap-2">
                 <Trophy size={18} />
                 View Leaderboard
               </Button>

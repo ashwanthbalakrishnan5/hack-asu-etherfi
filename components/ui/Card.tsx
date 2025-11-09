@@ -1,12 +1,13 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, HTMLMotionProps } from "framer-motion";
 
-export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CardProps extends Omit<HTMLMotionProps<"div">, "children"> {
   hover?: boolean;
   gradient?: boolean;
   glow?: boolean;
+  children?: React.ReactNode;
 }
 
 export function Card({

@@ -44,7 +44,7 @@ export function WalletButton() {
 
               if (chain.unsupported) {
                 return (
-                  <Button onClick={openChainModal} variant="default">
+                  <Button onClick={openChainModal} variant="secondary">
                     Wrong Network
                   </Button>
                 );

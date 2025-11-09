@@ -108,7 +108,7 @@ export function WithdrawModal({ isOpen, onClose }: WithdrawModalProps) {
 
         {/* Action Buttons */}
         <div className="flex gap-3">
-          <Button variant="default" onClick={onClose} className="flex-1">
+          <Button variant="secondary" onClick={onClose} className="flex-1">
             Cancel
           </Button>
           <Button

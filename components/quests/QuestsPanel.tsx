@@ -75,7 +75,7 @@ export function QuestsPanel({ onAcceptQuest }: QuestsPanelProps) {
         {hasGenerated && quests.length > 0 && (
           <Button
             size="sm"
-            variant="default"
+            variant="secondary"
             onClick={handleGenerateQuests}
             disabled={isGenerating}
           >

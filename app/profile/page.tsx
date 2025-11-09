@@ -251,7 +251,7 @@ export default function ProfilePage() {
 
             <Button
               onClick={() => setEditMode(!editMode)}
-              variant="default"
+              variant="secondary"
               size="sm"
             >
               {editMode ? "Cancel" : "Edit Profile"}

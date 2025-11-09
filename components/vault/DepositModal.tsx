@@ -37,7 +37,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
   }, [isSuccess, step, onClose]);
 
   const handleMaxClick = () => {
-    setAmount(balance);
+    setAmount(balance.toString());
   };
 
   const handleApprove = async () => {
@@ -130,7 +130,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 
         {/* Action Buttons */}
         <div className="flex gap-3">
-          <Button variant="default" onClick={onClose} className="flex-1">
+          <Button variant="secondary" onClick={onClose} className="flex-1">
             Cancel
           </Button>
           <Button
