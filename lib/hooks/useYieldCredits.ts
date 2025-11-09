@@ -65,13 +65,13 @@ export function useYieldCredits() {
     fetchYCBalance();
   }, [fetchYCBalance]);
 
-  // Poll for YC accrual every 10 seconds
+  // Poll for YC accrual every 5 minutes
   useEffect(() => {
     if (!address) return;
 
     const interval = setInterval(() => {
       accrueYC();
-    }, 10000); // 10 seconds
+    }, 300000); // 5 minutes
 
     return () => clearInterval(interval);
   }, [address, accrueYC]);

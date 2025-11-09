@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 
 /**
  * Hook to periodically auto-resolve markets in the background
- * Runs every 30 seconds when the page is visible
+ * Runs every 10 minutes
  */
 export function useAutoResolve(enabled: boolean = true) {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -12,8 +12,8 @@ export function useAutoResolve(enabled: boolean = true) {
 
     const autoResolve = async () => {
       try {
-        const response = await fetch('/api/markets/auto-resolve', {
-          method: 'POST',
+        const response = await fetch("/api/markets/auto-resolve", {
+          method: "POST",
         });
 
         if (response.ok) {
@@ -22,22 +22,22 @@ export function useAutoResolve(enabled: boolean = true) {
             console.log(`Auto-resolved ${data.resolved} markets:`, data.markets);
             // Trigger a custom event that other components can listen to
             window.dispatchEvent(
-              new CustomEvent('markets-resolved', {
+              new CustomEvent("markets-resolved", {
                 detail: { count: data.resolved, markets: data.markets },
               })
             );
           }
         }
       } catch (error) {
-        console.error('Auto-resolve error:', error);
+        console.error("Auto-resolve error:", error);
       }
     };
 
     // Run immediately on mount
     autoResolve();
 
-    // Then run every 30 seconds
-    intervalRef.current = setInterval(autoResolve, 30000);
+    // Then run every 10 minutes
+    intervalRef.current = setInterval(autoResolve, 600000);
 
     return () => {
       if (intervalRef.current) {
