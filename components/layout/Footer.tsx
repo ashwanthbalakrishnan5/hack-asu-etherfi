@@ -5,7 +5,7 @@ import { Tooltip } from "@/components/ui";
 export function Footer() {
   return (
     <footer className="w-full border-t border-surface bg-background py-6">
-      <div className="container mx-auto max-w-7xl px-4">
+      <div className="w-full px-6 mx-auto" style={{ maxWidth: '1800px' }}>
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
           {/* EtherFi Badge */}
           <Tooltip content="Your principal is staked in weETH, earning yield that funds your predictions">
@@ -33,7 +33,7 @@ export function Footer() {
 
           {/* Copyright */}
           <p className="text-sm text-foreground/60">
-            © {new Date().getFullYear()} EtherFi Predictions. Demo only.
+            © {new Date().getFullYear()} Yield Quest. Demo only.
           </p>
         </div>
       </div>

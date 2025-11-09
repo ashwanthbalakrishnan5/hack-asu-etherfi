@@ -30,6 +30,11 @@ export function Web3Provider({ children }: { children: React.ReactNode }) {
             accentColorForeground: "#0a0f1a",
             borderRadius: "medium",
           })}
+          modalSize="compact"
+          appInfo={{
+            appName: "Yield Quest",
+            learnMoreUrl: undefined,
+          }}
         >
           {children}
         </RainbowKitProvider>

@@ -125,7 +125,7 @@ export default function PlayPage() {
 
   if (!isConnected) {
     return (
-      <div className="container mx-auto flex min-h-[calc(100vh-200px)] max-w-7xl items-center justify-center px-4 py-16">
+      <div className="flex min-h-[calc(100vh-200px)] items-center justify-center px-6 py-16 mx-auto" style={{ maxWidth: '1800px' }}>
         <Card className="max-w-md text-center">
           <h2 className="mb-4 text-2xl font-bold text-foreground">
             Connect Your Wallet
@@ -141,10 +141,10 @@ export default function PlayPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="container mx-auto max-w-7xl px-4 py-8">
-        <div className="grid gap-6 lg:grid-cols-[380px_1fr] xl:grid-cols-[420px_1fr]">
+      <div className="w-full py-8 px-6 mx-auto" style={{ maxWidth: '1800px' }}>
+        <div className="grid gap-6 lg:grid-cols-[400px_1fr]">
           {/* Left Column: Vault and YC Meter */}
-          <div className="space-y-6 lg:sticky lg:top-24 lg:self-start">
+          <div className="space-y-6 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto">
             <VaultCard />
           </div>
 

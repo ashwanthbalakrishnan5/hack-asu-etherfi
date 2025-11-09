@@ -117,7 +117,7 @@ export default function ProfilePage() {
 
   if (!isConnected) {
     return (
-      <div className="container mx-auto flex min-h-[calc(100vh-200px)] max-w-7xl items-center justify-center px-4 py-16">
+      <div className="flex min-h-[calc(100vh-200px)] items-center justify-center px-6 py-16 mx-auto" style={{ maxWidth: '1800px' }}>
         <Card className="max-w-md text-center">
           <h2 className="mb-4 text-2xl font-bold text-foreground">
             Connect Your Wallet
@@ -133,7 +133,7 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto max-w-7xl px-4 py-8">
+      <div className="w-full px-6 py-8 mx-auto" style={{ maxWidth: '1800px' }}>
         <div className="animate-pulse space-y-6">
           <div className="h-48 rounded-lg bg-gray-800" />
           <div className="h-64 rounded-lg bg-gray-800" />
@@ -144,7 +144,7 @@ export default function ProfilePage() {
 
   if (error || !profile) {
     return (
-      <div className="container mx-auto flex min-h-[calc(100vh-200px)] max-w-7xl items-center justify-center px-4 py-16">
+      <div className="flex min-h-[calc(100vh-200px)] items-center justify-center px-6 py-16 mx-auto" style={{ maxWidth: '1800px' }}>
         <Card className="max-w-md text-center">
           <h2 className="mb-4 text-2xl font-bold text-foreground">
             {error || 'Profile Not Found'}
@@ -172,7 +172,7 @@ export default function ProfilePage() {
     `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-8">
+    <div className="w-full px-6 py-8 mx-auto" style={{ maxWidth: '1800px' }}>
       <div className="space-y-6">
         {/* Profile Header */}
         <Card>

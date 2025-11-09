@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Coins, Zap } from "lucide-react";
+import { Coins, Zap, Info } from "lucide-react";
 import { motion } from "framer-motion";
 import { Tooltip } from "@/components/ui";
 
@@ -48,7 +48,7 @@ export function YCMeter({ balance, isAccruing = true }: YCMeterProps) {
       <div className="relative z-10">
         <div className="mb-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary/30 to-secondary/30 border border-primary/40">
+            <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary/30 to-secondary/30 border border-primary/40">
               <Coins className="text-primary" size={20} />
               {isAccruing && (
                 <motion.div
@@ -64,14 +64,16 @@ export function YCMeter({ balance, isAccruing = true }: YCMeterProps) {
               <span className="text-sm font-semibold text-foreground block">
                 Yield Credits
               </span>
-              <span className="text-xs text-foreground-muted">
-                {isAccruing ? "Actively accruing" : "No principal deposited"}
-              </span>
+              {isAccruing && (
+                <span className="text-xs text-foreground-muted">
+                  Actively accruing
+                </span>
+              )}
             </div>
           </div>
-          <Tooltip content="YC accrues from your deposited principal. Use it to make predictions without risking your principal.">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface-elevated/50 border border-surface-elevated hover:border-primary/30 transition-colors cursor-help">
-              <span className="text-xs text-foreground-muted">ℹ️</span>
+          <Tooltip content="Use YC for predictions">
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-surface-elevated/50 border border-surface-elevated hover:border-primary/30 transition-colors cursor-help">
+              <Info className="w-3 h-3 text-foreground-muted" />
             </div>
           </Tooltip>
         </div>
@@ -83,7 +85,7 @@ export function YCMeter({ balance, isAccruing = true }: YCMeterProps) {
             animate={{ scale: 1, opacity: 1 }}
             className="text-4xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent"
           >
-            {balance}
+            {parseFloat(balance).toFixed(2)}
           </motion.span>
           <span className="text-base text-foreground-muted font-medium">YC</span>
         </div>

@@ -89,7 +89,7 @@ export default function LeaderboardPage() {
   ];
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-8">
+    <div className="w-full px-6 py-8 mx-auto" style={{ maxWidth: '1800px' }}>
       <div className="space-y-6">
         {/* Header */}
         <div>

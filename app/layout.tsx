@@ -16,9 +16,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "EtherFi Prediction Game | No-Loss Yield Predictions",
+  title: "Yield Quest | No-Loss Prediction Markets",
   description:
-    "Predict with yield, keep your principal safe. Powered by EtherFi weETH and Claude AI.",
+    "Play prediction markets with yield, keep your principal safe. Powered by EtherFi weETH and Claude AI.",
 };
 
 export default function RootLayout({
