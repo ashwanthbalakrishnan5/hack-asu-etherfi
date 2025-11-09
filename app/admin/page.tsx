@@ -75,6 +75,9 @@ export default function AdminPage() {
           </button>
         </div>
 
+        {/* Demo Setup Card */}
+        <DemoSetupCard address={address} />
+
         {/* Create Market Form */}
         {showCreateForm && (
           <CreateMarketForm
@@ -242,6 +245,85 @@ function CreateMarketForm({
           </button>
         </div>
       </form>
+    </div>
+  );
+}
+
+// Demo Setup Card Component
+function DemoSetupCard({ address }: { address: string }) {
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleDemoSetup = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      setMessage(null);
+
+      const response = await fetch('/api/demo/setup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to setup demo');
+      }
+
+      setMessage(data.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to setup demo');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border border-purple-500/30 rounded-lg p-6">
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <h2 className="text-xl font-bold text-white mb-2">🎮 Demo Mode Setup</h2>
+          <p className="text-gray-300 mb-4">
+            Don't have weETH? Click below to initialize demo mode with free YC and test markets!
+          </p>
+          <ul className="text-sm text-gray-400 space-y-1 mb-4">
+            <li>• Get 1000 YC instantly (no weETH required)</li>
+            <li>• Seed 8 diverse prediction markets</li>
+            <li>• Test all features: betting, quests, achievements</li>
+            <li>• Perfect for demos and development</li>
+          </ul>
+          {message && (
+            <div className="bg-green-500/20 border border-green-500/50 rounded-lg p-3 text-sm text-green-400 mb-4">
+              {message}
+            </div>
+          )}
+          {error && (
+            <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-3 text-sm text-red-400 mb-4">
+              {error}
+            </div>
+          )}
+        </div>
+      </div>
+      <button
+        onClick={handleDemoSetup}
+        disabled={loading}
+        className="px-6 py-3 bg-gradient-to-r from-purple-500 to-cyan-500 text-white font-medium rounded-lg hover:from-purple-600 hover:to-cyan-600 transition-all duration-200 shadow-lg shadow-purple-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+      >
+        {loading ? (
+          <>
+            <Loader2 className="w-4 h-4 animate-spin" />
+            Setting up demo...
+          </>
+        ) : (
+          <>
+            <Plus className="w-4 h-4" />
+            Initialize Demo Mode
+          </>
+        )}
+      </button>
     </div>
   );
 }

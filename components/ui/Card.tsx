@@ -6,7 +6,7 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function Card({ hover = false, className = "", children, ...props }: CardProps) {
   const baseStyles =
-    "bg-surface rounded-lg shadow-sm transition-all duration-200 border border-surface";
+    "bg-surface rounded-lg shadow-sm transition-all duration-200 border border-surface p-6";
   const hoverStyles = hover ? "hover:shadow-md hover:border-primary/20" : "";
 
   return (
