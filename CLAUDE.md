@@ -989,7 +989,7 @@ This plan breaks down the entire project into 6 logical phases, each building up
 
 - [x] Phase 0: Project Bootstrap & Foundation
 - [x] Phase 1: Wallet Integration & Basic UI Shell
-- [ ] Phase 2: Smart Contracts & Vault Integration
+- [x] Phase 2: Smart Contracts & Vault Integration
 - [ ] Phase 3: Markets & Prediction Gameplay
 - [ ] Phase 4: Claude Quests & Adaptive Gameplay
 - [ ] Phase 5: Player Progression & Social Features
@@ -998,4 +998,40 @@ This plan breaks down the entire project into 6 logical phases, each building up
 
 ## Implementation Notes for future developers
 
-- Fill here
+### Phase 2 Completion Notes (Smart Contracts & Vault Integration)
+
+**What was implemented:**
+1. GameVault.sol smart contract deployed with deposit/withdraw functionality
+2. MockWeETH.sol token contract for testing (includes faucet function)
+3. Hardhat 2.x development environment with OpenZeppelin 5.x contracts
+4. Prisma ORM with SQLite database for user data and YC balances
+5. API routes for YC management:
+   - GET /api/yc/balance - Fetch user YC balance
+   - POST /api/yc/accrue - Calculate and update YC accrual
+   - POST /api/yc/update-principal - Update user principal balance
+6. React hooks for vault and YC management (useVault, useYieldCredits)
+7. Vault UI components: VaultCard, DepositModal, WithdrawModal, YCMeter
+8. YC accrual logic with simulated 5% APR
+
+**Technical decisions:**
+- Used Hardhat 2.x instead of 3.x due to ESM compatibility issues with Next.js
+- OpenZeppelin 5.x contracts require passing owner address to Ownable constructor
+- YC balances are managed off-chain in database (no on-chain YC token)
+- SQLite database for demo purposes (production should use PostgreSQL)
+- Simulated APR of 5% for demo (real APR would come from EtherFi protocol)
+
+**Contract addresses (local Hardhat):**
+- MockWeETH: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+- GameVault: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+
+**Next steps for deployment:**
+1. Deploy contracts to Sepolia testnet using `npx hardhat run scripts/deploy.js --network sepolia`
+2. Update .env.local with deployed contract addresses
+3. Get Sepolia ETH from faucet and weETH from MockWeETH faucet function
+4. Test full deposit/withdraw flow on Sepolia
+
+**Known limitations:**
+- Gas estimation is placeholder (shows static value)
+- No real oracle integration for APR (using simulated 5%)
+- Database is local SQLite (needs PostgreSQL for production)
+- No transaction error handling for network failures
