@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { Card, Button } from "@/components/ui";
 import { WalletButton } from "@/components/wallet/WalletButton";
-import { QuestHistory } from "@/components/quests";
 import { LevelBadge, AchievementBadge, PortfolioAnalytics } from "@/components/profile";
 import { ACHIEVEMENT_DEFINITIONS } from "@/lib/achievements";
 
@@ -321,12 +320,6 @@ export default function ProfilePage() {
               <p className="text-xl font-bold text-red-400">{profile.losses}</p>
             </div>
             <div>
-              <p className="text-sm text-foreground/70">Quests Completed</p>
-              <p className="text-xl font-bold text-purple-400">
-                {profile.completedQuests}
-              </p>
-            </div>
-            <div>
               <p className="text-sm text-foreground/70">YC Balance</p>
               <p className="text-xl font-bold text-cyan-400">
                 {profile.ycBalance.toFixed(2)}
@@ -392,9 +385,6 @@ export default function ProfilePage() {
             ))}
           </div>
         </Card>
-
-        {/* Quest History */}
-        <QuestHistory />
       </div>
     </div>
   );
