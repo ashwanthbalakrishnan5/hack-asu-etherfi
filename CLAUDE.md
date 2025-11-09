@@ -1021,6 +1021,8 @@ This plan breaks down the entire project into 6 logical phases, each building up
 - Toast store: use toast.success/error (not useToast hook)
 - XP system: +10 bet, +20 win, +50 streak
 - User stats (wins, losses, accuracy) tracked in users table
+- Tooltip component: uses isMounted check to prevent hydration issues, properly cleans up setTimeout
+- Web3Provider: QueryClient uses useState with lazy initialization for stability across renders
 
 **Phase 4 Requirements:**
 

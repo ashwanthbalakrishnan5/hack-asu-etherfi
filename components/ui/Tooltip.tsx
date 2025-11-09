@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 export interface TooltipProps {
   content: string;
@@ -10,6 +10,42 @@ export interface TooltipProps {
 
 export function Tooltip({ content, children, position = "top" }: TooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Ensure component is mounted to avoid hydration issues
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const handleMouseEnter = () => {
+    // Clear any existing timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    // Set new timeout
+    timeoutRef.current = setTimeout(() => {
+      setIsVisible(true);
+    }, 300);
+  };
+
+  const handleMouseLeave = () => {
+    // Clear timeout if user leaves before tooltip shows
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    setIsVisible(false);
+  };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   const positions = {
     top: "bottom-full left-1/2 -translate-x-1/2 mb-2",
@@ -21,12 +57,12 @@ export function Tooltip({ content, children, position = "top" }: TooltipProps) {
   return (
     <div className="relative inline-block">
       <div
-        onMouseEnter={() => setTimeout(() => setIsVisible(true), 300)}
-        onMouseLeave={() => setIsVisible(false)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
         {children}
       </div>
-      {isVisible && (
+      {isMounted && isVisible && (
         <div
           className={`absolute z-50 w-max max-w-xs rounded-md bg-surface px-3 py-2 text-sm text-foreground shadow-lg ring-1 ring-primary/20 ${positions[position]}`}
           role="tooltip"
