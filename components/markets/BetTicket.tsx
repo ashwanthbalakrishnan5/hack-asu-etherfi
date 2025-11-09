@@ -1,0 +1,359 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Market, ClaudeProbabilityHint } from '@/lib/types';
+import { X, TrendingUp, TrendingDown, Sparkles, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useAccount } from 'wagmi';
+import { formatDistanceToNow } from 'date-fns';
+
+interface BetTicketProps {
+  market: Market | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onBetPlaced?: () => void;
+  ycBalance: number;
+}
+
+export function BetTicket({
+  market,
+  isOpen,
+  onClose,
+  onBetPlaced,
+  ycBalance,
+}: BetTicketProps) {
+  const { address } = useAccount();
+  const [side, setSide] = useState<'YES' | 'NO'>('YES');
+  const [amount, setAmount] = useState<string>('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [hint, setHint] = useState<ClaudeProbabilityHint | null>(null);
+  const [loadingHint, setLoadingHint] = useState(false);
+
+  // Reset state when market changes
+  useEffect(() => {
+    if (market && isOpen) {
+      setSide('YES');
+      setAmount('');
+      setError(null);
+      fetchProbabilityHint();
+    }
+  }, [market, isOpen]);
+
+  // Handle ESC key to close
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [isOpen, onClose]);
+
+  const fetchProbabilityHint = async () => {
+    if (!market) return;
+
+    try {
+      setLoadingHint(true);
+      const response = await fetch('/api/claude/probability-hint', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question: market.question,
+          difficulty: market.difficulty,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setHint(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch hint:', err);
+      // Don't show error for hints - they're optional
+    } finally {
+      setLoadingHint(false);
+    }
+  };
+
+  const calculateExpectedPayout = () => {
+    if (!market || !amount || parseFloat(amount) <= 0) return 0;
+
+    const betAmount = parseFloat(amount);
+    const totalPool = market.yesPool + market.noPool + betAmount;
+    const sidePool =
+      (side === 'YES' ? market.yesPool : market.noPool) + betAmount;
+
+    if (sidePool === 0) return betAmount;
+
+    return betAmount * (totalPool / sidePool);
+  };
+
+  const handlePlaceBet = async () => {
+    if (!market || !address) return;
+
+    const betAmount = parseFloat(amount);
+
+    // Validation
+    if (isNaN(betAmount) || betAmount <= 0) {
+      setError('Please enter a valid amount');
+      return;
+    }
+
+    if (betAmount > ycBalance) {
+      setError(`Insufficient YC balance. You have ${ycBalance.toFixed(2)} YC`);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch('/api/positions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userAddress: address,
+          marketId: market.id,
+          side,
+          amount: betAmount,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to place bet');
+      }
+
+      // Success!
+      onBetPlaced?.();
+      onClose();
+
+      // Show success toast (you can add a toast library later)
+      console.log('Bet placed successfully!', data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to place bet');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const expectedPayout = calculateExpectedPayout();
+  const potentialProfit = expectedPayout - (parseFloat(amount) || 0);
+
+  if (!market) return null;
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+          />
+
+          {/* Panel */}
+          <motion.div
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            className="fixed right-0 top-0 h-full w-full max-w-md bg-gradient-to-br from-gray-900 to-gray-800 shadow-2xl z-50 overflow-y-auto"
+          >
+            <div className="p-6 space-y-6">
+              {/* Header */}
+              <div className="flex items-start justify-between">
+                <div className="flex-1 pr-4">
+                  <h2 className="text-2xl font-bold text-white mb-2">Place Bet</h2>
+                  <p className="text-sm text-gray-400 line-clamp-2">
+                    {market.question}
+                  </p>
+                </div>
+                <button
+                  onClick={onClose}
+                  className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+                  aria-label="Close"
+                >
+                  <X className="w-5 h-5 text-gray-400" />
+                </button>
+              </div>
+
+              {/* YC Balance */}
+              <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                <div className="text-sm text-gray-400 mb-1">Your YC Balance</div>
+                <div className="text-3xl font-bold text-cyan-400">
+                  {ycBalance.toFixed(2)} <span className="text-lg text-gray-500">YC</span>
+                </div>
+              </div>
+
+              {/* Side Selector */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-300">
+                  Select Side
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => setSide('YES')}
+                    className={`p-4 rounded-lg border-2 transition-all ${
+                      side === 'YES'
+                        ? 'border-green-500 bg-green-500/20 text-green-400'
+                        : 'border-gray-700 bg-gray-800 text-gray-400 hover:border-green-500/50'
+                    }`}
+                  >
+                    <TrendingUp className="w-5 h-5 mx-auto mb-1" />
+                    <div className="font-bold">YES</div>
+                    <div className="text-xs opacity-75">
+                      {((market.yesPool / (market.yesPool + market.noPool)) * 100 || 50).toFixed(1)}%
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => setSide('NO')}
+                    className={`p-4 rounded-lg border-2 transition-all ${
+                      side === 'NO'
+                        ? 'border-red-500 bg-red-500/20 text-red-400'
+                        : 'border-gray-700 bg-gray-800 text-gray-400 hover:border-red-500/50'
+                    }`}
+                  >
+                    <TrendingDown className="w-5 h-5 mx-auto mb-1" />
+                    <div className="font-bold">NO</div>
+                    <div className="text-xs opacity-75">
+                      {((market.noPool / (market.yesPool + market.noPool)) * 100 || 50).toFixed(1)}%
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              {/* Amount Input */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-300">
+                  Bet Amount (YC)
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="0.00"
+                    min="0"
+                    step="0.01"
+                    max={ycBalance}
+                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                  />
+                  <button
+                    onClick={() => setAmount(ycBalance.toString())}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 text-xs font-medium text-cyan-400 hover:text-cyan-300 transition-colors"
+                  >
+                    MAX
+                  </button>
+                </div>
+                <div className="text-xs text-gray-500">
+                  Available: {ycBalance.toFixed(2)} YC
+                </div>
+              </div>
+
+              {/* Expected Payout */}
+              {parseFloat(amount) > 0 && (
+                <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm text-gray-400">Expected Payout</span>
+                    <span className="text-lg font-bold text-cyan-400">
+                      {expectedPayout.toFixed(2)} YC
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-400">Potential Profit</span>
+                    <span
+                      className={`text-sm font-medium ${
+                        potentialProfit > 0 ? 'text-green-400' : 'text-gray-400'
+                      }`}
+                    >
+                      +{potentialProfit.toFixed(2)} YC
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Claude Probability Hint */}
+              {loadingHint && (
+                <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
+                  <div className="flex items-center gap-2 text-purple-400">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span className="text-sm">Getting Claude's insights...</span>
+                  </div>
+                </div>
+              )}
+
+              {hint && !loadingHint && (
+                <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4 space-y-2">
+                  <div className="flex items-center gap-2 text-purple-400 mb-2">
+                    <Sparkles className="w-4 h-4" />
+                    <span className="text-sm font-medium">Claude's Analysis</span>
+                  </div>
+                  <div className="text-sm text-gray-300">
+                    <div className="mb-2">
+                      <span className="font-medium text-purple-400">
+                        Probability:
+                      </span>{' '}
+                      {(hint.probability * 100).toFixed(1)}% YES
+                    </div>
+                    <div className="mb-2 text-gray-400">{hint.rationale}</div>
+                    <div className="text-xs text-purple-300/80 italic">
+                      💡 Tip: {hint.tip}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Market Info */}
+              <div className="text-xs text-gray-500 space-y-1">
+                <div>Difficulty: {market.difficulty}/5</div>
+                <div>
+                  Closes {formatDistanceToNow(new Date(market.closeTime), { addSuffix: true })}
+                </div>
+              </div>
+
+              {/* Error Message */}
+              {error && (
+                <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3 text-sm text-red-400">
+                  {error}
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="space-y-3">
+                <button
+                  onClick={handlePlaceBet}
+                  disabled={loading || !address || parseFloat(amount) <= 0}
+                  className="w-full px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-medium rounded-lg hover:from-cyan-600 hover:to-blue-600 transition-all duration-200 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Placing Bet...
+                    </>
+                  ) : (
+                    <>Confirm Bet</>
+                  )}
+                </button>
+                <button
+                  onClick={onClose}
+                  disabled={loading}
+                  className="w-full px-6 py-3 bg-gray-700 text-gray-300 font-medium rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}

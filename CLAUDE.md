@@ -990,7 +990,7 @@ This plan breaks down the entire project into 6 logical phases, each building up
 - [x] Phase 0: Project Bootstrap & Foundation
 - [x] Phase 1: Wallet Integration & Basic UI Shell
 - [x] Phase 2: Smart Contracts & Vault Integration
-- [ ] Phase 3: Markets & Prediction Gameplay
+- [x] Phase 3: Markets & Prediction Gameplay
 - [ ] Phase 4: Claude Quests & Adaptive Gameplay
 - [ ] Phase 5: Player Progression & Social Features
 - [ ] Phase 6: Portfolio Analytics & Final Polish
@@ -1035,3 +1035,83 @@ This plan breaks down the entire project into 6 logical phases, each building up
 - No real oracle integration for APR (using simulated 5%)
 - Database is local SQLite (needs PostgreSQL for production)
 - No transaction error handling for network failures
+
+### Phase 3 Completion Notes (Markets & Prediction Gameplay)
+
+**What was implemented:**
+1. Complete market management system:
+   - GET /api/markets - List markets with filtering (active/resolved)
+   - POST /api/markets - Create new markets (admin only)
+   - PATCH /api/markets/:id/resolve - Resolve markets with outcomes
+   - POST /api/markets/seed - Seed 10 demo markets
+   - DELETE /api/markets/seed - Clear all markets for testing
+
+2. Positions/betting system:
+   - POST /api/positions - Place YC bets on markets
+   - GET /api/positions - Fetch user positions
+   - POST /api/positions/:id/claim - Claim winnings from resolved markets
+   - Automatic YC balance updates and XP rewards
+
+3. Claude AI integration for probability hints:
+   - POST /api/claude/probability-hint - Generate probability estimates
+   - Returns JSON with probability (0-1), rationale, and educational tip
+   - 5-minute caching for performance
+   - Graceful fallback if API key not configured
+
+4. UI components:
+   - MarketCard - Display market details, pools, odds, and status
+   - MarketsList - List markets with tabs for active/resolved
+   - BetTicket - Slide-in panel for placing bets with Claude hints
+   - PositionsList - Show user positions with claim functionality
+
+5. Admin panel (/admin):
+   - Create new markets with question, difficulty, and close time
+   - Resolve markets with YES/NO/CANCEL outcomes
+   - View all markets and their status
+
+6. Play page integration:
+   - Full markets display with betting functionality
+   - User positions list with claim buttons
+   - Real-time YC balance updates
+   - BetTicket opens on "Place Bet" click
+
+**Technical decisions:**
+- Next.js 15+ requires `params` to be async in dynamic routes
+- Used date-fns for date formatting and relative times
+- Installed @anthropic-ai/sdk for Claude integration
+- Fixed toast store usage (toast.success/error instead of useToast hook)
+- Markets use simple payout formula: amount * (totalPool / sidePool)
+- XP system: +10 for placing bet, +20 for winning, +50 for 3-win streak
+
+**Component architecture:**
+- MarketCard shows difficulty (1-5 stars), pools, odds, and close time
+- BetTicket fetches Claude hints on open, calculates expected payout
+- PositionsList shows status badges (Pending, Won, Lost, Claimable)
+- All components use Framer Motion for smooth animations
+
+**API features:**
+- Market filtering by status (active/resolved)
+- Position validation (YC balance, market status, amount)
+- Automatic stats tracking (wins, losses, accuracy)
+- XP and level calculations on bet placement and claim
+- Claim validation (market resolved, not already claimed, correct outcome)
+
+**Demo data:**
+- 10 seed markets covering crypto, tech, finance, and economy
+- Varied difficulty levels (1-5)
+- Close times ranging from 15-60 days
+- Topics include Bitcoin, Ethereum, AI, Tesla, Fed rates, etc.
+
+**Known limitations:**
+- Claude hints are optional and gracefully fail if API not configured
+- No real oracle integration for market resolution (admin manual)
+- Payout calculations are simple (no AMM or complex pricing)
+- No gas estimates for on-chain transactions
+- Positions are tracked off-chain in database only
+
+**Next steps for Phase 4:**
+- Implement quest generation system
+- Create QuestCard and QuestsPanel components
+- Add quest acceptance and completion tracking
+- Build post-resolution feedback from Claude
+- Integrate quests into Play page

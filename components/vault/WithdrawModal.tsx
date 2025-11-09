@@ -5,7 +5,7 @@ import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useVault } from "@/lib/hooks";
-import { useToast } from "@/lib/stores/toast";
+import { toast } from "@/lib/stores/toast";
 
 interface WithdrawModalProps {
   isOpen: boolean;
@@ -16,7 +16,6 @@ export function WithdrawModal({ isOpen, onClose }: WithdrawModalProps) {
   const [amount, setAmount] = useState("");
   const { principalBalance, withdraw, isPending, isConfirming, isSuccess } =
     useVault();
-  const { showToast } = useToast();
 
   // Reset on open
   useEffect(() => {
@@ -28,10 +27,10 @@ export function WithdrawModal({ isOpen, onClose }: WithdrawModalProps) {
   // Handle success
   useEffect(() => {
     if (isSuccess) {
-      showToast("Withdrawal successful!", "success");
+      toast.success("Withdrawal successful!");
       onClose();
     }
-  }, [isSuccess, showToast, onClose]);
+  }, [isSuccess, onClose]);
 
   const handleMaxClick = () => {
     setAmount(principalBalance);
@@ -39,21 +38,20 @@ export function WithdrawModal({ isOpen, onClose }: WithdrawModalProps) {
 
   const handleWithdraw = async () => {
     if (!amount || parseFloat(amount) <= 0) {
-      showToast("Please enter a valid amount", "error");
+      toast.error("Please enter a valid amount");
       return;
     }
 
     if (parseFloat(amount) > parseFloat(principalBalance)) {
-      showToast("Insufficient principal balance", "error");
+      toast.error("Insufficient principal balance");
       return;
     }
 
     try {
       await withdraw(amount);
     } catch (error) {
-      showToast(
-        error instanceof Error ? error.message : "Withdrawal failed",
-        "error"
+      toast.error(
+        error instanceof Error ? error.message : "Withdrawal failed"
       );
     }
   };
