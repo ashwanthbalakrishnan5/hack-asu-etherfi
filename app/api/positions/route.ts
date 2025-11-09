@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { checkAndAwardAchievements } from '@/lib/achievements';
 
 const prisma = new PrismaClient();
 
@@ -80,12 +81,14 @@ export async function POST(request: NextRequest) {
 
     // Create position and update market pools in a transaction
     const result = await prisma.$transaction(async (tx) => {
-      // Deduct YC from user
+      // Deduct YC from user and track ycSpent
       const updatedUser = await tx.user.update({
         where: { id: user!.id },
         data: {
           ycBalance: { decrement: amount },
           totalBets: { increment: 1 },
+          ycSpent: { increment: amount },
+          xp: { increment: 10 }, // Award XP for placing bet
         },
       });
 
@@ -112,12 +115,10 @@ export async function POST(request: NextRequest) {
       return { position, user: updatedUser, market: updatedMarket };
     });
 
-    // Award XP for placing bet (+10)
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        xp: { increment: 10 },
-      },
+    // Check achievements (for First Blood)
+    const newAchievements = await checkAndAwardAchievements({
+      userId: user.id,
+      userAddress,
     });
 
     return NextResponse.json({
@@ -125,6 +126,7 @@ export async function POST(request: NextRequest) {
       newYCBalance: result.user.ycBalance,
       market: result.market,
       xpEarned: 10,
+      newAchievements,
     }, { status: 201 });
   } catch (error) {
     console.error('Error creating position:', error);
