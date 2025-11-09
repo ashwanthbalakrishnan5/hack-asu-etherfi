@@ -8,8 +8,8 @@ import { VaultCard } from '@/components/vault';
 import { MarketsList } from '@/components/markets/MarketsList';
 import { BetTicket } from '@/components/markets/BetTicket';
 import { PositionsList } from '@/components/markets/PositionsList';
-import { QuestsPanel } from '@/components/quests';
-import { Market, Quest } from '@/lib/types';
+import { GameModePanel } from '@/components/gamemode';
+import { Market } from '@/lib/types';
 import { Trophy } from 'lucide-react';
 import { toast } from '@/lib/stores/toast';
 import { useAutoResolve } from '@/lib/hooks/useAutoResolve';
@@ -69,59 +69,6 @@ export default function PlayPage() {
     setRefreshKey((prev) => prev + 1);
   };
 
-  const handleAcceptQuest = async (quest: Quest) => {
-    if (!address) {
-      toast.error("Please connect your wallet");
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/quests/accept", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          questId: quest.id,
-          address,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to accept quest");
-      }
-
-      const data = await response.json();
-
-      // Convert market data to Market type
-      const market: Market = {
-        id: data.market.id,
-        question: data.market.question,
-        closeTime: new Date(data.market.closeTime).getTime(),
-        difficulty: data.market.difficulty,
-        yesPool: data.market.yesPool,
-        noPool: data.market.noPool,
-        resolved: data.market.resolved,
-        outcome: data.market.outcome,
-        createdAt: new Date(data.market.createdAt).getTime(),
-      };
-
-      // Open bet ticket with the market
-      setSelectedMarket(market);
-      setIsBetTicketOpen(true);
-
-      toast.success("Quest accepted! Now place your bet.");
-
-      // Refresh markets list
-      setRefreshKey((prev) => prev + 1);
-    } catch (error) {
-      console.error("Error accepting quest:", error);
-      toast.error(
-        error instanceof Error ? error.message : "Failed to accept quest"
-      );
-    }
-  };
 
   if (!isConnected) {
     return (
@@ -148,25 +95,16 @@ export default function PlayPage() {
             <VaultCard />
           </div>
 
-          {/* Right Column: Quests and Markets */}
+          {/* Right Column: Game Mode and Markets */}
           <div className="space-y-6 min-w-0">
-            {/* Claude Quests */}
-            <QuestsPanel onAcceptQuest={handleAcceptQuest} />
+            {/* Game Mode Panel */}
+            <GameModePanel />
 
             {/* Active Markets */}
             <div className="min-w-0">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                <h3 className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground-muted bg-clip-text text-transparent">
-                  Prediction Markets
-                </h3>
-                <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/30 backdrop-blur-sm">
-                  <div className="text-xs text-foreground-muted">Your YC Balance</div>
-                  <div className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                    {Number(ycBalance).toFixed(2)}
-                  </div>
-                  <div className="text-sm text-foreground-muted font-medium">YC</div>
-                </div>
-              </div>
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground-muted bg-clip-text text-transparent mb-6">
+                Live Markets
+              </h3>
               <MarketsList key={refreshKey} onPlaceBet={handlePlaceBet} />
             </div>
 

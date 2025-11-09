@@ -22,7 +22,7 @@ Create a polished, demo-ready dApp: a no-loss, yield-only prediction game built 
 1. Users **stake weETH** (principal) → principal is **safe** and **never used** to bet.
 2. A **Yield Credits** balance accrues from the principal (demo may simulate APR).
 3. Users **spend Yield Credits only** to make predictions on real-world events.
-4. **Claude** generates personalized quests, difficulty tuning, and learning hints.
+4. **Two game modes**: Manual (user places bets) or Automated (Claude researches and bets automatically).
 5. Users **level up** and **earn achievements** (NFT-ready designs) for skill, accuracy, and consistency.
 6. Users **withdraw principal anytime**; wins and losses only affect Yield Credits.
 
@@ -69,22 +69,30 @@ The UI must make this loop immediately obvious without reading documentation.
   - Claim flow transfers YC winnings to the user’s YC balance.
   - Clean receipts/notifications with a link to the “My Quests” view.
 
-### D) Quests by Claude (Adaptive Game Master)
+### D) Game Modes (Manual vs Automated)
 
-- “Get Quests” surface shows 3 live quests curated for the user.
-- For each quest:
-  - Title and clear question.
-  - Suggested YC stake.
-  - Difficulty (1–5).
-  - One-sentence learning outcome (what the user will practice).
-  - Deadline/close time.
-- Accepting a quest:
-  - Pre-configures a binary market card.
-  - Prefills bet ticket with suggested YC (user editable).
-- Post-resolution feedback (from Claude):
-  - One short paragraph of guidance based on outcome pattern (e.g., “you over-weight momentum… try setting a cap on stake variance”).
-  - One suggested micro-quest or practice tip (non-binding).
-- Deterministic JSON requirements outlined in “Claude Integration” below.
+**Manual Mode:**
+- User browses prediction markets and places bets manually
+- Full control over which markets to bet on and how much YC to wager
+- Claude can still provide probability hints when placing individual bets
+
+**Automated Mode:**
+- Claude acts as an AI trading agent that researches markets and places bets automatically
+- User sets risk preferences:
+  - Risk level: Low (conservative), Medium (balanced), High (aggressive)
+  - Max bet per market (YC amount)
+  - Minimum confidence threshold (%)
+- Claude performs automated research:
+  - Fetches current data online about market questions
+  - Analyzes trends, factors, and information
+  - Makes predictions with confidence scores
+  - Places bets automatically when confidence exceeds threshold
+- Dashboard shows:
+  - Active automated bets count
+  - Total YC deployed
+  - Estimated returns
+  - Enable/disable toggle
+- Warning: Users should monitor YC balance and understand automated trading carries risk
 
 ### E) Player Progression & Achievements
 
@@ -140,7 +148,7 @@ The UI must make this loop immediately obvious without reading documentation.
 ### 2) Play
 
 - Left column: Vault Card, YC Meter, Deposit/Withdraw.
-- Right column: Claude Quests (3 cards max), Active Markets, Resolved Markets.
+- Right column: Game Mode Panel (Manual/Automated toggle with settings), Active Markets, Resolved Markets.
 - Bet Ticket slides in from right; dismissible with ESC/backdrop click.
 - Always show current YC prominently near action buttons.
 
@@ -150,8 +158,9 @@ The UI must make this loop immediately obvious without reading documentation.
 - Subheader: Level, XP, Accuracy, Wisdom Index.
 - Sections:
   - Achievements grid with hover tooltips.
-  - History timeline of accepted quests and outcomes (concise).
+  - Portfolio analytics with time series charts and insights.
   - Preferences: leaderboard opt-out, notifications, display name.
+- Demo Mode: New users automatically get dummy data (stats, achievements, bet history) for demonstration purposes.
 
 ### 4) Leaderboard
 
@@ -237,17 +246,30 @@ The UI must make this loop immediately obvious without reading documentation.
 ## Claude Integration (Deterministic, JSON-only)
 
 - Endpoints to generate:
-  - Quests feed: returns an array of exactly 3 quests.
-  - Probability hint (optional): returns a float 0–1 and a 1-paragraph rationale.
-  - Post-resolution feedback: returns a short paragraph and one suggestion string.
+  - Automated prediction: researches market questions online, returns prediction with confidence score and reasoning
+  - Probability hint (optional for manual mode): returns a float 0–1 and a 1-paragraph rationale
+  - Betting decision: determines whether to place a bet based on risk settings and confidence threshold
 - Output contract:
   - Always JSON, fixed fields, no prose outside JSON.
   - Reject and retry if the format deviates.
+  - Example automated prediction response:
+    ```json
+    {
+      "prediction": "YES" | "NO",
+      "confidence": 0-100,
+      "reasoning": "brief explanation",
+      "shouldBet": true | false,
+      "suggestedAmount": number
+    }
+    ```
 - Inputs:
-  - Minimal user profile stats (wins/losses/accuracy/stakes).
-  - Never pass secrets or PII.
+  - Market question, close time, difficulty
+  - User risk settings (risk level, max bet, min confidence)
+  - Minimal user profile stats (wins/losses/accuracy/stakes)
+  - Never pass secrets or PII
 - Safety:
-  - Instruct Claude not to provide financial advice; it may provide educational hints only.
+  - Instruct Claude not to provide financial advice; it may provide educational hints only
+  - Warn users that automated mode carries risk and past performance doesn't guarantee future results
 
 ---
 
@@ -285,13 +307,16 @@ The UI must make this loop immediately obvious without reading documentation.
 
 ---
 
-## Quality Criteria (What “done” looks like)
+## Quality Criteria (What "done" looks like)
 
 - Users can connect a wallet, see real or read-only **weETH** balances, and deposit/withdraw to a demo vault.
 - YC accrues visually and is spendable; principal remains clearly separate and safe.
-- Claude provides 3 tailored quests, each fully formed and selectable.
+- Users can toggle between Manual and Automated game modes with clear UI feedback.
+- In Manual mode, users can browse markets and place YC bets themselves.
+- In Automated mode, users can configure risk settings and Claude automatically researches and places bets.
 - Users can place a YC bet, see it in Active Markets, and later see a resolved outcome with the ability to claim YC.
 - Profile shows level, XP, accuracy, achievements grid with designed badges.
+- New users automatically receive dummy data (stats, achievements) for demo purposes.
 - Leaderboards display top users by Accuracy and Wisdom Index.
 - The interface is modern, consistent, accessible, and visually refined per this file.
 
@@ -582,81 +607,76 @@ This plan breaks down the entire project into 6 logical phases, each building up
 
 ---
 
-### **PHASE 4: Claude Quests & Adaptive Gameplay** (Days 17-21)
+### **PHASE 4: Game Modes & Automated Claude Trading** (Days 17-21)
 
-**Goal:** Claude generates personalized quests. Users can accept quests and receive post-resolution feedback.
+**Goal:** Implement Manual and Automated game modes. In Automated mode, Claude researches markets and places bets automatically.
 
 #### Tasks:
 
-1. **Quest Generation System**
-   - API: `POST /api/quests/generate`
-     - Input: user stats (wins, losses, accuracy, recentStakes, level)
+1. **Game Mode System**
+   - Create **GameModePanel** component:
+     - Two-column mode selector (Manual vs Automated)
+     - Manual: Shows description and active mode indicator
+     - Automated: Shows settings panel and stats dashboard
+     - Visual distinction with icons (Hand for Manual, Bot for Automated)
+
+2. **Automated Mode Settings**
+   - Risk level selector (Low, Medium, High):
+     - Low: Conservative betting, >70% confidence threshold
+     - Medium: Balanced approach, >60% confidence threshold
+     - High: Aggressive betting, >50% confidence threshold
+   - Max bet per market (YC amount input)
+   - Minimum confidence threshold (slider 50-90%)
+   - Save settings button
+
+3. **Automated Betting Backend**
+   - API: `POST /api/gamemode/toggle`
+     - Enable/disable automated mode
+     - Store user settings
+   - API: `POST /api/gamemode/predict`
+     - Input: marketId, address, riskLevel
      - Call Anthropic API with structured prompt:
        ```
-       Return JSON only with exactly 3 quests:
-       [
-         {
-           "title": "string",
-           "question": "string",
-           "suggestedStake": number,
-           "difficulty": 1-5,
-           "learningOutcome": "one sentence",
-           "closeTime": "ISO timestamp"
-         },
-         ...
-       ]
-       Rules:
-       - Adapt difficulty to user's accuracy (if >70%, harder quests)
-       - Vary topics (finance, sports, politics, tech, culture)
-       - Ensure closeTime is 1-7 days out
-       - No financial advice
-       ```
-     - Validate JSON structure, retry once if malformed
-     - Store quests with userId, status: generated
-
-2. **Quest UI Components**
-   - **QuestsPanel** on `/play` page:
-     - "Get Quests" button (calls generate API)
-     - Display 3 quest cards in vertical or grid layout
-   - **QuestCard** component:
-     - Title and question
-     - Difficulty (color-coded: easy=green, hard=red)
-     - Suggested YC stake (editable)
-     - Learning outcome in italics
-     - Countdown to close time
-     - "Accept Quest" button
-   - **AcceptQuest** flow:
-     - Creates a market (or links to existing market with same question)
-     - Pre-fills BetTicket with quest details
-     - Marks quest as accepted
-     - User completes bet as normal
-     - Track quest completion separately from regular bets
-
-3. **Post-Resolution Feedback**
-   - API: `POST /api/quests/:id/feedback`
-     - Input: questId, outcome (won/lost), user stats
-     - Call Anthropic API:
-       ```
-       Return JSON only:
+       Analyze this prediction market question:
+       - Research the question online
+       - Consider recent trends and data
+       - Return JSON:
        {
-         "feedback": "one paragraph analyzing user's decision",
-         "suggestion": "one micro-quest or tip"
+         "prediction": "YES" | "NO",
+         "confidence": 0-100,
+         "reasoning": "brief explanation",
+         "shouldBet": true | false,
+         "suggestedAmount": number
        }
        ```
-     - Store feedback with quest record
-   - Display in **QuestFeedbackModal** after user claims or views resolved quest:
-     - Show outcome (won/lost)
-     - Claude's feedback paragraph
-     - Suggested next step
-     - "Got it" button to dismiss
+     - If shouldBet is true and confidence meets threshold:
+       - Automatically place bet on market
+       - Update user YC balance
+       - Track automated position
+   - API: `GET /api/gamemode/stats`
+     - Return active automated bets count
+     - Total YC deployed
+     - Estimated returns based on current pools
 
-4. **Quest Tracking**
-   - Profile page: "My Quests" section
-     - Timeline view: accepted → in progress → resolved → completed
-     - Show feedback for completed quests
-     - Stats: total quests completed, success rate
+4. **Automated Mode UI**
+   - Status banner (Active/Inactive) with enable/disable toggle
+   - Stats cards showing:
+     - Active bets count
+     - YC deployed amount
+     - Estimated return (profit/loss)
+   - Warning message about risks
+   - Settings collapsible panel
 
-**Deliverable:** Users can generate 3 personalized quests, accept them, and receive Claude's feedback after resolution. Quests feel adaptive and educational.
+5. **Demo Data Generation**
+   - Update `GET /api/users/:address` endpoint
+   - When creating new user, generate dummy data:
+     - Random stats (10-30 bets, 50-80% accuracy)
+     - Calculated XP, level, wins, losses
+     - YC spent/won amounts
+     - 2-3 common achievements (FIRST_BET, HAT_TRICK)
+   - Ensures profile never shows empty state for demo
+
+**Deliverable:** Users can toggle between Manual and Automated modes. Automated mode uses Claude to research and place bets automatically. New users see populated profiles with dummy data.
 
 ---
 

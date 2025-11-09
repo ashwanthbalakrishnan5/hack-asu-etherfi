@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { useState, useTransition } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { Menu, X, Loader2 } from "lucide-react";
 import { WalletButton } from "@/components/wallet/WalletButton";
 import { Button } from "@/components/ui";
+import { CreditsWidget } from "@/components/credits";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -17,9 +18,15 @@ const navLinks = [
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-surface bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      {/* Loading Bar */}
+      {isPending && (
+        <div className="absolute top-0 left-0 right-0 h-0.5 bg-primary animate-pulse" />
+      )}
       <div className="flex h-16 items-center justify-between px-6 mx-auto" style={{ maxWidth: '1800px' }}>
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 group">
@@ -54,8 +61,9 @@ export function Header() {
           })}
         </nav>
 
-        {/* Wallet Button */}
-        <div className="hidden md:block">
+        {/* Credits & Wallet */}
+        <div className="hidden md:flex items-center gap-3">
+          <CreditsWidget />
           <WalletButton />
         </div>
 

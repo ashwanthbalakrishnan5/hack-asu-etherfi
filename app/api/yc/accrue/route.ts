@@ -13,21 +13,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Address is required" }, { status: 400 });
     }
 
-    // Get or create user
-    let user = await prisma.user.findUnique({
+    // Get or create user using upsert to avoid race conditions
+    const user = await prisma.user.upsert({
       where: { address: address.toLowerCase() },
+      update: {},
+      create: {
+        address: address.toLowerCase(),
+        ycBalance: 0,
+        principal: 0,
+        lastAccrualTime: new Date(),
+      },
     });
-
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          address: address.toLowerCase(),
-          ycBalance: 0,
-          principal: 0,
-          lastAccrualTime: new Date(),
-        },
-      });
-    }
 
     // Calculate time elapsed since last accrual
     const now = new Date();
@@ -49,9 +45,9 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({
-      balance: updatedUser.ycBalance.toFixed(4),
+      balance: updatedUser.ycBalance,
       lastAccrualTime: updatedUser.lastAccrualTime.toISOString(),
-      accruedSinceLastFetch: accruedYC.toFixed(4),
+      accruedSinceLastFetch: accruedYC,
     });
   } catch (error) {
     console.error("Error accruing YC:", error);

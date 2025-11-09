@@ -146,30 +146,6 @@ export function MarketCard({ market, onPlaceBet }: MarketCardProps) {
             </h3>
             <div className="flex items-center gap-2 flex-wrap">
               {getStatusBadge()}
-
-              {/* Difficulty Badge */}
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.1 }}
-                className={`px-3 py-1.5 rounded-full ${difficultyColors.bg} ${difficultyColors.text} flex items-center gap-1.5 border ${difficultyColors.border}`}
-              >
-                <Target className="w-3.5 h-3.5" />
-                <span className="text-xs font-bold">{difficultyLabel}</span>
-                <div className="flex items-center gap-0.5 ml-1">
-                  {difficultyStars.map((filled, i) => (
-                    <motion.span
-                      key={i}
-                      initial={{ scale: 0, rotate: -180 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ delay: 0.2 + i * 0.05, type: 'spring' }}
-                      className={`text-xs ${filled ? difficultyColors.text : 'text-gray-600'}`}
-                    >
-                      ★
-                    </motion.span>
-                  ))}
-                </div>
-              </motion.div>
             </div>
           </div>
         </div>
