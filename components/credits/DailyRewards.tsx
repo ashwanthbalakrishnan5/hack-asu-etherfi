@@ -108,18 +108,19 @@ export function DailyRewards({ isOpen, onClose }: DailyRewardsProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9998]"
           />
 
-          {/* Modal */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
-          >
-            <div className="w-full max-w-lg pointer-events-auto">
-              <Card className="bg-gradient-to-br from-purple-900/30 to-blue-900/30 border-purple-400/30">
+          {/* Modal Container */}
+          <div className="fixed inset-0 z-[9999] overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="w-full max-w-lg my-8"
+              >
+                <Card className="bg-gradient-to-br from-purple-900/30 to-blue-900/30 border-purple-400/30">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-3">
@@ -254,8 +255,9 @@ export function DailyRewards({ isOpen, onClose }: DailyRewardsProps) {
                   Login daily to build your streak and earn more credits!
                 </div>
               </Card>
+              </motion.div>
             </div>
-          </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>

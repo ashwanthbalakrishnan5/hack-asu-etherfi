@@ -82,18 +82,19 @@ export function CreditsStore({ isOpen, onClose, currentBalance }: CreditsStorePr
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]"
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9998]"
           />
 
-          {/* Modal */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed inset-0 z-[70] flex items-center justify-center p-4 overflow-y-auto"
-          >
-            <div className="w-full max-w-2xl my-8">
-              <Card className="bg-gradient-to-br from-gray-900 to-gray-800 border-primary/30">
+          {/* Modal Container */}
+          <div className="fixed inset-0 z-[9999] overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="w-full max-w-2xl my-8"
+              >
+                <Card className="bg-gradient-to-br from-gray-900 to-gray-800 border-primary/30">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-3">
@@ -195,8 +196,9 @@ export function CreditsStore({ isOpen, onClose, currentBalance }: CreditsStorePr
                   </div>
                 </div>
               </Card>
+              </motion.div>
             </div>
-          </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>

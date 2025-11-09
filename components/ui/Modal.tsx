@@ -37,26 +37,28 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <>
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="absolute inset-0 bg-background/90 backdrop-blur-md"
+            className="fixed inset-0 bg-black/70 backdrop-blur-md z-[9998]"
             onClick={onClose}
           />
 
-          {/* Modal */}
-          <motion.div
-            ref={modalRef}
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ duration: 0.3, type: "spring", damping: 25, stiffness: 300 }}
-            className="relative z-10 w-full max-w-lg rounded-2xl border-2 border-surface-elevated/50 bg-gradient-to-br from-surface via-surface-elevated to-surface p-6 shadow-2xl shadow-primary/10 backdrop-blur-xl"
-          >
+          {/* Modal Container */}
+          <div className="fixed inset-0 z-[9999] overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4">
+              <motion.div
+                ref={modalRef}
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                transition={{ duration: 0.3, type: "spring", damping: 25, stiffness: 300 }}
+                className="relative w-full max-w-lg my-8 rounded-2xl border-2 border-surface-elevated/50 bg-gradient-to-br from-surface via-surface-elevated to-surface p-6 shadow-2xl shadow-primary/10 backdrop-blur-xl"
+              >
             {/* Gradient overlay */}
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
 
@@ -77,8 +79,10 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
 
             {/* Content */}
             <div className="relative z-10">{children}</div>
-          </motion.div>
-        </div>
+              </motion.div>
+            </div>
+          </div>
+        </>
       )}
     </AnimatePresence>
   );
