@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useVault } from "@/lib/hooks";
 import { useWeETHBalance } from "@/lib/hooks";
-import { useToast } from "@/lib/stores/toast";
+import { toast } from "@/lib/stores/toast";
 
 interface DepositModalProps {
   isOpen: boolean;
@@ -18,7 +18,6 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
   const { balance } = useWeETHBalance();
   const { approve, deposit, needsApproval, isPending, isConfirming, isSuccess } =
     useVault();
-  const { showToast } = useToast();
   const [step, setStep] = useState<"input" | "approve" | "deposit">("input");
 
   // Reset on open
@@ -32,10 +31,10 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
   // Handle success
   useEffect(() => {
     if (isSuccess && step === "deposit") {
-      showToast("Deposit successful!", "success");
+      toast.success("Deposit successful!");
       onClose();
     }
-  }, [isSuccess, step, showToast, onClose]);
+  }, [isSuccess, step, onClose]);
 
   const handleMaxClick = () => {
     setAmount(balance);
@@ -43,7 +42,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 
   const handleApprove = async () => {
     if (!amount || parseFloat(amount) <= 0) {
-      showToast("Please enter a valid amount", "error");
+      toast.error("Please enter a valid amount");
       return;
     }
 
@@ -51,16 +50,15 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
       await approve(amount);
       setStep("approve");
     } catch (error) {
-      showToast(
-        error instanceof Error ? error.message : "Approval failed",
-        "error"
+      toast.error(
+        error instanceof Error ? error.message : "Approval failed"
       );
     }
   };
 
   const handleDeposit = async () => {
     if (!amount || parseFloat(amount) <= 0) {
-      showToast("Please enter a valid amount", "error");
+      toast.error("Please enter a valid amount");
       return;
     }
 
@@ -68,9 +66,8 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
       await deposit(amount);
       setStep("deposit");
     } catch (error) {
-      showToast(
-        error instanceof Error ? error.message : "Deposit failed",
-        "error"
+      toast.error(
+        error instanceof Error ? error.message : "Deposit failed"
       );
     }
   };
