@@ -5,7 +5,7 @@ import { useAccount } from "wagmi";
 import { Card, Button } from "@/components/ui";
 import { WalletButton } from "@/components/wallet/WalletButton";
 import { QuestHistory } from "@/components/quests";
-import { LevelBadge, AchievementBadge } from "@/components/profile";
+import { LevelBadge, AchievementBadge, PortfolioAnalytics } from "@/components/profile";
 import { ACHIEVEMENT_DEFINITIONS } from "@/lib/achievements";
 
 interface UserProfile {
@@ -326,6 +326,9 @@ export default function ProfilePage() {
             </div>
           </div>
         </Card>
+
+        {/* Portfolio Analytics */}
+        {address && <PortfolioAnalytics address={address} />}
 
         {/* Achievements */}
         <Card>
