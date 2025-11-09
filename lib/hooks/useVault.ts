@@ -66,13 +66,20 @@ export function useVault() {
     });
   };
 
-  // Refetch data when transaction is successful
+  // Refetch data and sync to database when transaction is successful
   useEffect(() => {
-    if (isSuccess) {
+    if (isSuccess && address) {
       refetchPrincipal();
       refetchAllowance();
+
+      // Sync principal balance to database
+      fetch("/api/yc/sync-principal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address }),
+      }).catch((error) => console.error("Failed to sync principal:", error));
     }
-  }, [isSuccess, refetchPrincipal, refetchAllowance]);
+  }, [isSuccess, address, refetchPrincipal, refetchAllowance]);
 
   const formattedPrincipal = principalBalance
     ? formatEther(principalBalance as bigint)

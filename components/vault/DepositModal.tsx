@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/Input";
 import { useVault } from "@/lib/hooks";
 import { useWeETHBalance } from "@/lib/hooks";
 import { toast } from "@/lib/stores/toast";
+import { FaucetButton } from "./FaucetButton";
 
 interface DepositModalProps {
   isOpen: boolean;
@@ -15,7 +16,7 @@ interface DepositModalProps {
 
 export function DepositModal({ isOpen, onClose }: DepositModalProps) {
   const [amount, setAmount] = useState("");
-  const { balance } = useWeETHBalance();
+  const { balance, refetch: refetchBalance } = useWeETHBalance();
   const { approve, deposit, needsApproval, isPending, isConfirming, isSuccess } =
     useVault();
   const [step, setStep] = useState<"input" | "approve" | "deposit">("input");
@@ -85,7 +86,10 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
       <div className="space-y-4">
         {/* Balance Display */}
         <div className="rounded-lg bg-surface/30 p-3">
-          <p className="text-sm text-foreground/70">Your weETH Balance</p>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-sm text-foreground/70">Your weETH Balance</p>
+            <FaucetButton onSuccess={refetchBalance} />
+          </div>
           <p className="text-lg font-semibold text-foreground">{balance} weETH</p>
         </div>
 
