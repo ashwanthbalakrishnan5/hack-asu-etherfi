@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Card, Badge, Button } from "@/components/ui";
 import { Clock, Target, Sparkles, TrendingUp } from "lucide-react";
 import { Quest } from "@/lib/types";
@@ -11,16 +12,32 @@ interface QuestCardProps {
 }
 
 export function QuestCard({ quest, onAccept, disabled }: QuestCardProps) {
-  // Calculate time remaining
-  const now = Date.now();
-  const timeRemaining = quest.closeTime - now;
-  const hoursRemaining = Math.floor(timeRemaining / (1000 * 60 * 60));
-  const daysRemaining = Math.floor(hoursRemaining / 24);
+  const [mounted, setMounted] = useState(false);
+  const [timeDisplay, setTimeDisplay] = useState("--");
 
-  const timeDisplay =
-    daysRemaining > 0
-      ? `${daysRemaining}d ${hoursRemaining % 24}h`
-      : `${hoursRemaining}h`;
+  useEffect(() => {
+    setMounted(true);
+
+    // Calculate time remaining after mount
+    const updateTime = () => {
+      const now = Date.now();
+      const timeRemaining = quest.closeTime - now;
+      const hoursRemaining = Math.floor(timeRemaining / (1000 * 60 * 60));
+      const daysRemaining = Math.floor(hoursRemaining / 24);
+
+      const display =
+        daysRemaining > 0
+          ? `${daysRemaining}d ${hoursRemaining % 24}h`
+          : `${hoursRemaining}h`;
+
+      setTimeDisplay(display);
+    };
+
+    updateTime();
+    const interval = setInterval(updateTime, 60000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, [quest.closeTime]);
 
   // Difficulty styling
   const difficultyColors = {

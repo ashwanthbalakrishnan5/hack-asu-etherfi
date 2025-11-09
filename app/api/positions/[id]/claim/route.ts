@@ -42,10 +42,10 @@ export async function POST(
 
     // Get user
     const user = await prisma.user.findUnique({
-      where: { address: userAddress },
+      where: { address: userAddress.toLowerCase() },
     });
 
-    if (!user || user.id !== position.userId) {
+    if (!user || user.address !== position.userId.toLowerCase()) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -97,7 +97,7 @@ export async function POST(
       // Check for streak bonus
       const recentPositions = await prisma.position.findMany({
         where: {
-          userId: user.id,
+          userId: user.address,
         },
         include: {
           market: true,
@@ -151,7 +151,7 @@ export async function POST(
       const wisdomIndex = calculateWisdomIndex(accuracy, yieldEfficiency, streakCount);
 
       const updatedUser = await tx.user.update({
-        where: { id: user.id },
+        where: { address: user.address },
         data: {
           ycBalance: { increment: payout },
           wins: won ? { increment: 1 } : undefined,
@@ -170,7 +170,7 @@ export async function POST(
 
     // Check achievements
     const newAchievements = await checkAndAwardAchievements({
-      userId: user.id,
+      userId: user.address,
       userAddress,
     });
 

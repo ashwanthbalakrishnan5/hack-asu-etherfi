@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export interface TooltipProps {
   content: string;
@@ -48,10 +49,17 @@ export function Tooltip({ content, children, position = "top" }: TooltipProps) {
   }, []);
 
   const positions = {
-    top: "bottom-full left-1/2 -translate-x-1/2 mb-2",
-    bottom: "top-full left-1/2 -translate-x-1/2 mt-2",
-    left: "right-full top-1/2 -translate-y-1/2 mr-2",
-    right: "left-full top-1/2 -translate-y-1/2 ml-2",
+    top: "bottom-full left-1/2 -translate-x-1/2 mb-3",
+    bottom: "top-full left-1/2 -translate-x-1/2 mt-3",
+    left: "right-full top-1/2 -translate-y-1/2 mr-3",
+    right: "left-full top-1/2 -translate-y-1/2 ml-3",
+  };
+
+  const arrowPositions = {
+    top: "bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2",
+    bottom: "top-0 left-1/2 -translate-x-1/2 -translate-y-1/2",
+    left: "right-0 top-1/2 -translate-y-1/2 translate-x-1/2",
+    right: "left-0 top-1/2 -translate-y-1/2 -translate-x-1/2",
   };
 
   return (
@@ -62,25 +70,23 @@ export function Tooltip({ content, children, position = "top" }: TooltipProps) {
       >
         {children}
       </div>
-      {isMounted && isVisible && (
-        <div
-          className={`absolute z-50 w-max max-w-xs rounded-md bg-surface px-3 py-2 text-sm text-foreground shadow-lg ring-1 ring-primary/20 ${positions[position]}`}
-          role="tooltip"
-        >
-          {content}
-          <div
-            className={`absolute h-2 w-2 rotate-45 bg-surface ${
-              position === "top"
-                ? "bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2"
-                : position === "bottom"
-                  ? "top-0 left-1/2 -translate-x-1/2 -translate-y-1/2"
-                  : position === "left"
-                    ? "right-0 top-1/2 -translate-y-1/2 translate-x-1/2"
-                    : "left-0 top-1/2 -translate-y-1/2 -translate-x-1/2"
-            }`}
-          />
-        </div>
-      )}
+      <AnimatePresence>
+        {isMounted && isVisible && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
+            className={`absolute z-50 w-max max-w-xs rounded-xl bg-gradient-to-br from-surface-elevated to-surface px-4 py-2.5 text-sm text-foreground shadow-xl shadow-primary/10 ring-1 ring-primary/30 backdrop-blur-xl ${positions[position]}`}
+            role="tooltip"
+          >
+            {content}
+            <div
+              className={`absolute h-2 w-2 rotate-45 bg-surface-elevated ring-1 ring-primary/30 ${arrowPositions[position]}`}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

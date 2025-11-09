@@ -20,6 +20,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const normalizedAddress = address.toLowerCase();
+
     // Get the quest
     const quest = await prisma.quest.findUnique({
       where: { id: questId },
@@ -31,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     // Verify user owns this quest
     const user = await prisma.user.findUnique({
-      where: { address },
+      where: { address: normalizedAddress },
     });
 
     if (!user || quest.userId !== user.id) {

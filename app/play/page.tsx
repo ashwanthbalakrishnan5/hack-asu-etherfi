@@ -12,13 +12,17 @@ import { QuestsPanel } from '@/components/quests';
 import { Market, Quest } from '@/lib/types';
 import { Trophy } from 'lucide-react';
 import { toast } from '@/lib/stores/toast';
+import { useAutoResolve } from '@/lib/hooks/useAutoResolve';
 
 export default function PlayPage() {
   const { isConnected, address } = useAccount();
   const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
   const [isBetTicketOpen, setIsBetTicketOpen] = useState(false);
-  const [ycBalance, setYcBalance] = useState(0);
+  const [ycBalance, setYcBalance] = useState<number>(0);
   const [refreshKey, setRefreshKey] = useState(0);
+
+  // Auto-resolve markets in the background
+  useAutoResolve(isConnected);
 
   // Fetch YC balance
   useEffect(() => {
@@ -27,6 +31,19 @@ export default function PlayPage() {
     }
   }, [address, refreshKey]);
 
+  // Listen for market resolution events and refresh
+  useEffect(() => {
+    const handleMarketsResolved = () => {
+      setRefreshKey((prev) => prev + 1);
+      toast.success('Markets have been resolved! Check your positions.');
+    };
+
+    window.addEventListener('markets-resolved', handleMarketsResolved as EventListener);
+    return () => {
+      window.removeEventListener('markets-resolved', handleMarketsResolved as EventListener);
+    };
+  }, []);
+
   const fetchYCBalance = async () => {
     if (!address) return;
 
@@ -34,7 +51,8 @@ export default function PlayPage() {
       const response = await fetch(`/api/yc/balance?address=${address}`);
       if (response.ok) {
         const data = await response.json();
-        setYcBalance(data.balance);
+        // Ensure balance is always a number
+        setYcBalance(typeof data.balance === 'number' ? data.balance : parseFloat(data.balance) || 0);
       }
     } catch (error) {
       console.error('Error fetching YC balance:', error);
@@ -122,55 +140,60 @@ export default function PlayPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-8">
-      <div className="grid gap-6 lg:grid-cols-[350px_1fr]">
-        {/* Left Column: Vault and YC Meter */}
-        <div className="space-y-6">
-          <VaultCard />
-        </div>
-
-        {/* Right Column: Quests and Markets */}
-        <div className="space-y-6">
-          {/* Claude Quests */}
-          <QuestsPanel onAcceptQuest={handleAcceptQuest} />
-
-          {/* Active Markets */}
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-2xl font-bold text-foreground">
-                Prediction Markets
-              </h3>
-              <div className="text-right">
-                <div className="text-sm text-foreground/70">Your YC Balance</div>
-                <div className="text-xl font-bold text-cyan-400">
-                  {ycBalance.toFixed(2)} <span className="text-sm text-foreground/60">YC</span>
-                </div>
-              </div>
-            </div>
-            <MarketsList key={refreshKey} onPlaceBet={handlePlaceBet} />
+    <div className="min-h-screen">
+      <div className="container mx-auto max-w-7xl px-4 py-8">
+        <div className="grid gap-6 lg:grid-cols-[380px_1fr] xl:grid-cols-[420px_1fr]">
+          {/* Left Column: Vault and YC Meter */}
+          <div className="space-y-6 lg:sticky lg:top-24 lg:self-start">
+            <VaultCard />
           </div>
 
-          {/* User Positions - Show claimable positions */}
-          <Card>
-            <div className="flex items-center gap-2 mb-4">
-              <Trophy className="w-5 h-5 text-cyan-400" />
-              <h3 className="text-lg font-semibold text-foreground">
-                My Positions
-              </h3>
-            </div>
-            <PositionsList onPositionClaimed={handleBetPlaced} />
-          </Card>
-        </div>
-      </div>
+          {/* Right Column: Quests and Markets */}
+          <div className="space-y-6 min-w-0">
+            {/* Claude Quests */}
+            <QuestsPanel onAcceptQuest={handleAcceptQuest} />
 
-      {/* Bet Ticket Panel */}
-      <BetTicket
-        market={selectedMarket}
-        isOpen={isBetTicketOpen}
-        onClose={() => setIsBetTicketOpen(false)}
-        onBetPlaced={handleBetPlaced}
-        ycBalance={ycBalance}
-      />
+            {/* Active Markets */}
+            <div className="min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground-muted bg-clip-text text-transparent">
+                  Prediction Markets
+                </h3>
+                <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/30 backdrop-blur-sm">
+                  <div className="text-xs text-foreground-muted">Your YC Balance</div>
+                  <div className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                    {Number(ycBalance).toFixed(2)}
+                  </div>
+                  <div className="text-sm text-foreground-muted font-medium">YC</div>
+                </div>
+              </div>
+              <MarketsList key={refreshKey} onPlaceBet={handlePlaceBet} />
+            </div>
+
+            {/* User Positions - Show claimable positions */}
+            <Card gradient glow>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-accent/20 to-accent/10 border border-accent/30">
+                  <Trophy className="w-5 h-5 text-accent" />
+                </div>
+                <h3 className="text-lg font-bold text-foreground">
+                  My Positions
+                </h3>
+              </div>
+              <PositionsList onPositionClaimed={handleBetPlaced} />
+            </Card>
+          </div>
+        </div>
+
+        {/* Bet Ticket Panel */}
+        <BetTicket
+          market={selectedMarket}
+          isOpen={isBetTicketOpen}
+          onClose={() => setIsBetTicketOpen(false)}
+          onBetPlaced={handleBetPlaced}
+          ycBalance={ycBalance}
+        />
+      </div>
     </div>
   );
 }

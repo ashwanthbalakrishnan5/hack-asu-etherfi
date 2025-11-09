@@ -119,7 +119,7 @@ export default function LeaderboardPage() {
                   setSearch('');
                   setSearchInput('');
                 }}
-                variant="secondary"
+                variant="default"
               >
                 Clear
               </Button>
@@ -260,7 +260,7 @@ export default function LeaderboardPage() {
                     <Button
                       onClick={() => setPage(page - 1)}
                       disabled={page === 1}
-                      variant="secondary"
+                      variant="default"
                       size="sm"
                     >
                       Previous
@@ -295,7 +295,7 @@ export default function LeaderboardPage() {
                     <Button
                       onClick={() => setPage(page + 1)}
                       disabled={page === data.totalPages}
-                      variant="secondary"
+                      variant="default"
                       size="sm"
                     >
                       Next

@@ -32,15 +32,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const normalizedAddress = userAddress.toLowerCase();
+
     // Get or create user
     let user = await prisma.user.findUnique({
-      where: { address: userAddress },
+      where: { address: normalizedAddress },
     });
 
     if (!user) {
       user = await prisma.user.create({
         data: {
-          address: userAddress,
+          address: normalizedAddress,
+          ycBalance: 1000,
+          principal: 0,
+          lastAccrualTime: new Date(),
         },
       });
     }

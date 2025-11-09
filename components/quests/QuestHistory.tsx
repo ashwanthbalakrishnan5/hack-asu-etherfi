@@ -135,7 +135,7 @@ export function QuestHistory() {
       );
     }
     return (
-      <Badge variant="secondary" className="gap-1">
+      <Badge variant="default" className="gap-1">
         <Sparkles size={12} />
         Generated
       </Badge>
@@ -229,7 +229,7 @@ export function QuestHistory() {
                 {quest.accepted && quest.marketId && quest.outcome && (
                   <Button
                     size="sm"
-                    variant="secondary"
+                    variant="default"
                     onClick={() => handleViewFeedback(quest)}
                     disabled={isLoadingFeedback}
                     className="mt-2 gap-2"

@@ -47,14 +47,19 @@ export default function ProfilePage() {
     locked: Achievement[];
   }>({ earned: [], locked: [] });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [displayName, setDisplayName] = useState("");
   const [showOnLeaderboard, setShowOnLeaderboard] = useState(true);
 
   useEffect(() => {
     if (isConnected && address) {
+      setLoading(true);
+      setError(null);
       fetchProfile();
       fetchAchievements();
+    } else {
+      setLoading(false);
     }
   }, [isConnected, address]);
 
@@ -66,9 +71,14 @@ export default function ProfilePage() {
         setProfile(data);
         setDisplayName(data.displayName || "");
         setShowOnLeaderboard(data.showOnLeaderboard);
+        setError(null);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Failed to load profile');
       }
     } catch (error) {
       console.error("Error fetching profile:", error);
+      setError('Failed to load profile. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -121,13 +131,31 @@ export default function ProfilePage() {
     );
   }
 
-  if (loading || !profile) {
+  if (loading) {
     return (
       <div className="container mx-auto max-w-7xl px-4 py-8">
         <div className="animate-pulse space-y-6">
           <div className="h-48 rounded-lg bg-gray-800" />
           <div className="h-64 rounded-lg bg-gray-800" />
         </div>
+      </div>
+    );
+  }
+
+  if (error || !profile) {
+    return (
+      <div className="container mx-auto flex min-h-[calc(100vh-200px)] max-w-7xl items-center justify-center px-4 py-16">
+        <Card className="max-w-md text-center">
+          <h2 className="mb-4 text-2xl font-bold text-foreground">
+            {error || 'Profile Not Found'}
+          </h2>
+          <p className="mb-6 text-foreground/70">
+            {error
+              ? 'There was an error loading your profile. Please try again.'
+              : 'Unable to load profile data.'}
+          </p>
+          <Button onClick={() => fetchProfile()}>Retry</Button>
+        </Card>
       </div>
     );
   }
@@ -184,7 +212,7 @@ export default function ProfilePage() {
 
             <Button
               onClick={() => setEditMode(!editMode)}
-              variant="secondary"
+              variant="default"
               size="sm"
             >
               {editMode ? "Cancel" : "Edit Profile"}

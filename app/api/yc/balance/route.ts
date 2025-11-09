@@ -16,10 +16,11 @@ export async function GET(request: NextRequest) {
     });
 
     if (!user) {
+      // New users get 1000 YC to start playing immediately (demo mode)
       user = await prisma.user.create({
         data: {
           address: address.toLowerCase(),
-          ycBalance: 0,
+          ycBalance: 1000,
           principal: 0,
           lastAccrualTime: new Date(),
         },

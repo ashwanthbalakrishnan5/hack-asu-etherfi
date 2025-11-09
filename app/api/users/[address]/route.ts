@@ -11,16 +11,23 @@ export async function GET(
 ) {
   try {
     const { address } = await params;
+    const normalizedAddress = address.toLowerCase();
 
-    const user = await prisma.user.findUnique({
-      where: { address },
+    // Get or create user
+    let user = await prisma.user.findUnique({
+      where: { address: normalizedAddress },
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
+      // Create new user with default values
+      user = await prisma.user.create({
+        data: {
+          address: normalizedAddress,
+          ycBalance: 1000, // Demo: Start with 1000 YC
+          principal: 0,
+          lastAccrualTime: new Date(),
+        },
+      });
     }
 
     // Calculate user class
@@ -57,10 +64,11 @@ export async function PATCH(
 ) {
   try {
     const { address } = await params;
+    const normalizedAddress = address.toLowerCase();
     const body = await request.json();
 
     const user = await prisma.user.findUnique({
-      where: { address },
+      where: { address: normalizedAddress },
     });
 
     if (!user) {

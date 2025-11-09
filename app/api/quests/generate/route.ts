@@ -28,9 +28,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const normalizedAddress = address.toLowerCase();
+
     // Get user stats for adaptive quest generation
     const user = await prisma.user.findUnique({
-      where: { address },
+      where: { address: normalizedAddress },
     });
 
     if (!user) {
@@ -118,7 +120,7 @@ Current date: ${new Date().toISOString()}`;
       questsData.quests.map((quest) =>
         prisma.quest.create({
           data: {
-            userId: user.id,
+            userId: address.toLowerCase(),
             title: quest.title,
             question: quest.question,
             suggestedStake: quest.suggestedStake,

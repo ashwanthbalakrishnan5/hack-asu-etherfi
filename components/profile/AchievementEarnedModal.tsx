@@ -11,11 +11,12 @@ interface AchievementEarnedModalProps {
 }
 
 // Simple confetti particle component
-function ConfettiParticle({ delay }: { delay: number }) {
+function ConfettiParticle({ delay, index }: { delay: number; index: number }) {
   const colors = ['#06b6d4', '#3b82f6', '#8b5cf6', '#f59e0b', '#10b981'];
-  const randomColor = colors[Math.floor(Math.random() * colors.length)];
-  const randomX = Math.random() * 100 - 50;
-  const randomRotate = Math.random() * 360;
+  // Use deterministic values based on index to avoid hydration mismatches
+  const randomColor = colors[index % colors.length];
+  const randomX = ((index * 37) % 100) - 50; // Pseudo-random but deterministic
+  const randomRotate = (index * 71) % 360;
 
   return (
     <motion.div
@@ -79,7 +80,7 @@ export function AchievementEarnedModal({
         {/* Confetti */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
           {Array.from({ length: 30 }).map((_, i) => (
-            <ConfettiParticle key={i} delay={i * 0.05} />
+            <ConfettiParticle key={i} delay={i * 0.05} index={i} />
           ))}
         </div>
 

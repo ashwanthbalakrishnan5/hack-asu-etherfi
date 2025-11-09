@@ -17,9 +17,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const normalizedAddress = userAddress.toLowerCase();
+
     // Get user
     const user = await prisma.user.findUnique({
-      where: { address: userAddress },
+      where: { address: normalizedAddress },
     });
 
     if (!user) {

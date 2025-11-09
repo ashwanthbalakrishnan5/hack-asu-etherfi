@@ -59,7 +59,7 @@ export function QuestFeedbackModal({
             <div className="mt-3 flex items-center gap-2">
               <span className="text-xs text-foreground/60">Outcome:</span>
               <Badge
-                variant={quest.outcome === "YES" ? "success" : "secondary"}
+                variant={quest.outcome === "YES" ? "success" : "error"}
               >
                 {quest.outcome}
               </Badge>

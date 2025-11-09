@@ -40,7 +40,7 @@ export default function Home() {
               <WalletButton />
             )}
             <Link href="/leaderboard">
-              <Button variant="secondary" size="lg">
+              <Button variant="default" size="lg">
                 View Leaderboard
               </Button>
             </Link>
