@@ -14,3 +14,5 @@ export { Tooltip } from "./Tooltip";
 export type { TooltipProps } from "./Tooltip";
 
 export { ToastContainer } from "./Toast";
+
+export { Modal } from "./Modal";

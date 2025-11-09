@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String   @id @default(uuid())
+  address           String   @unique
+  ycBalance         Float    @default(0)
+  principal         Float    @default(0)
+  lastAccrualTime   DateTime @default(now())
+  xp                Int      @default(0)
+  level             Int      @default(1)
+  accuracy          Float    @default(0)
+  totalBets         Int      @default(0)
+  wins              Int      @default(0)
+  losses            Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([address])
+}
+
+model Market {
+  id          String    @id @default(uuid())
+  question    String
+  closeTime   DateTime
+  difficulty  Int       @default(3)
+  yesPool     Float     @default(0)
+  noPool      Float     @default(0)
+  resolved    Boolean   @default(false)
+  outcome     String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  positions   Position[]
+}
+
+model Position {
+  id        String   @id @default(uuid())
+  userId    String
+  marketId  String
+  side      String
+  amount    Float
+  claimed   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  market    Market   @relation(fields: [marketId], references: [id])
+
+  @@index([userId])
+  @@index([marketId])
+}
+
+model Quest {
+  id              String   @id @default(uuid())
+  userId          String
+  title           String
+  question        String
+  suggestedStake  Float
+  difficulty      Int
+  learningOutcome String
+  closeTime       DateTime
+  accepted        Boolean  @default(false)
+  completed       Boolean  @default(false)
+  outcome         String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Achievement {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String
+  earnedAt  DateTime @default(now())
+
+  @@unique([userId, type])
+  @@index([userId])
+}

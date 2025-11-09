@@ -3,6 +3,7 @@
 import { useAccount } from "wagmi";
 import { Card } from "@/components/ui";
 import { WalletButton } from "@/components/wallet/WalletButton";
+import { VaultCard } from "@/components/vault";
 
 export default function PlayPage() {
   const { isConnected } = useAccount();
@@ -28,12 +29,7 @@ export default function PlayPage() {
       <div className="grid gap-6 lg:grid-cols-[350px_1fr]">
         {/* Left Column: Vault and YC Meter */}
         <div className="space-y-6">
-          <Card>
-            <h3 className="mb-4 text-lg font-semibold text-foreground">Vault</h3>
-            <p className="text-sm text-foreground/70">
-              Vault components will be implemented in Phase 2.
-            </p>
-          </Card>
+          <VaultCard />
         </div>
 
         {/* Right Column: Quests and Markets */}
