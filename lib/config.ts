@@ -19,7 +19,7 @@ export const config = {
   alchemyApiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || "",
 
   // Claude AI
-  anthropicApiKey: process.env.ANTHROPIC_API_KEY || "",
+  anthropicApiKey: process.env.CLAUDE_API_KEY || "",
 
   // Demo Config
   simulatedAPR: parseFloat(process.env.NEXT_PUBLIC_SIMULATED_APR || "5"),

@@ -293,15 +293,6 @@ export function MarketCard({ market, onPlaceBet }: MarketCardProps) {
             </motion.div>
           )}
         </div>
-
-        {/* Hover Info Overlay */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 10 }}
-          className="absolute top-2 right-2 bg-gray-900/95 backdrop-blur-sm border border-cyan-500/30 rounded-lg px-3 py-2 text-xs text-cyan-400 font-medium shadow-lg pointer-events-none"
-        >
-          {isActive ? 'Click to predict' : 'Market closed'}
-        </motion.div>
       </div>
     </motion.div>
   );

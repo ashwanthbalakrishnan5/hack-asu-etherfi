@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { checkAndAwardAchievements } from '@/lib/achievements';
 
-const prisma = new PrismaClient();
 
 // POST /api/achievements/check - Check and award achievements for a user
 export async function POST(request: NextRequest) {

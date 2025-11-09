@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { calculateUserClass } from '@/lib/achievements';
 
-const prisma = new PrismaClient();
 
 // Generate dummy data for demo purposes
 function generateDummyUserData() {

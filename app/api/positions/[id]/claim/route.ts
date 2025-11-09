@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import {
   checkAndAwardAchievements,
   calculateYieldEfficiency,
   calculateWisdomIndex,
 } from '@/lib/achievements';
 
-const prisma = new PrismaClient();
 
 // POST /api/positions/:id/claim - Claim winnings from a resolved market
 export async function POST(

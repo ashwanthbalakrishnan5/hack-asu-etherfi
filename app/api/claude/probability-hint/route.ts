@@ -6,8 +6,8 @@ const cache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 // Initialize Anthropic client
-const anthropic = process.env.ANTHROPIC_API_KEY
-  ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+const anthropic = process.env.CLAUDE_API_KEY
+  ? new Anthropic({ apiKey: process.env.CLAUDE_API_KEY })
   : null;
 
 export async function POST(request: NextRequest) {
@@ -31,10 +31,10 @@ export async function POST(request: NextRequest) {
 
     // If no Anthropic API key, return mock data
     if (!anthropic) {
-      console.warn('ANTHROPIC_API_KEY not set, returning mock probability hint');
+      console.warn('CLAUDE_API_KEY not set, returning mock probability hint');
       const mockHint = {
         probability: 0.5 + (Math.random() * 0.3 - 0.15), // Random between 0.35-0.65
-        rationale: 'This is a demo response. Configure ANTHROPIC_API_KEY to get real Claude insights.',
+        rationale: 'This is a demo response. Configure CLAUDE_API_KEY to get real Claude insights.',
         tip: 'Consider researching recent trends and data before placing your bet.',
       };
       return NextResponse.json(mockHint);
@@ -65,7 +65,7 @@ Respond with only the JSON object, nothing else.`;
 
     // Call Claude API
     const message = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 300,
       temperature: 0.7,
       messages: [

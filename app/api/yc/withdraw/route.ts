@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 
-const prisma = new PrismaClient();
 
 // POST /api/yc/withdraw - Withdraw YC to wallet (convert to some token or just reduce balance)
 export async function POST(request: NextRequest) {

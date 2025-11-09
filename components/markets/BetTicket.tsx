@@ -197,9 +197,13 @@ export function BetTicket({
                   </p>
                 </div>
                 <button
-                  onClick={onClose}
-                  className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClose();
+                  }}
+                  className="p-2 hover:bg-gray-700 rounded-lg transition-colors relative z-10"
                   aria-label="Close"
+                  type="button"
                 >
                   <X className="w-5 h-5 text-gray-400" />
                 </button>
@@ -488,10 +492,14 @@ export function BetTicket({
                   </div>
                 </motion.button>
                 <motion.button
-                  onClick={onClose}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClose();
+                  }}
                   disabled={loading}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
+                  type="button"
                   className="w-full px-6 py-3 bg-gray-800 border border-gray-700 text-gray-300 font-medium rounded-xl hover:bg-gray-700 hover:border-gray-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Cancel
