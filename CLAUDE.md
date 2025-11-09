@@ -1,1017 +1,790 @@
-# claude.md — Authoritative Build Instructions (No Code)
+# CLAUDE.md — Project Documentation & Build Instructions
 
 ## Purpose
 
-Create a polished, demo-ready dApp: a no-loss, yield-only prediction game built on EtherFi (weETH) with Claude as the adaptive Game Master. The **core emphasis is UI/UX perfection** and clear storytelling of “principal safe, yield plays.” Backend may be **basic or mocked**. Smart contracts may be minimal. Do not over-engineer.
+**EtherFi Yield Quest** is a demo-ready dApp showcasing a no-loss, yield-only prediction game concept built with Claude AI as the adaptive Game Master. The core narrative: users deposit weETH (principal stays safe), earn Yield Credits from yield, and spend only YC on predictions—never risking their principal.
 
-**Strict rules for the AI agent**
+**Current Status:** ~80-85% feature-complete. Demo-ready but NOT production-ready.
 
-- Do not hallucinate; if a fact is unknown, leave a TODO note for a human.
+**Strict Rules for AI Agents:**
+
+- Do not hallucinate; if a fact is unknown, leave a TODO comment or ask.
 - Do not generate code inside this file.
-- Do not add random files, boilerplate readmes, or non-essential docs.
-- Prefer **Next.js** (App or Pages Router) for the frontend and API routes. If a separate server is necessary, use **Python FastAPI or Flask** else use Next.js itself for API routes. Do **not** introduce Node.js servers beyond Next.js API routes.
-- Keep EtherFi and Claude integrations visible and central.
-- Always **Use Context7 MCP server** to fetch up-to-date documentation for all frameworks, libraries, and tools being used (Next.js, Wagmi, Viem, Tailwind CSS, Framer Motion, etc.). This ensures accurate implementation patterns, avoids deprecated APIs, and reduces errors from outdated knowledge.
-- Always **Use Sequential thinking MCP Server** to think through the tasks before implementing them.
-- After completing work, **update this file with any new constraints or instructions only**. Do **not** add progress logs or test reports. Do **not** create md files other than this one.
+- Do not add random files, boilerplate readmes, or non-essential documentation.
+- This file is the single source of truth for project state and requirements.
+- After completing work, update this file with new constraints or next-step instructions only.
+- Do NOT add progress logs, test reports, or status updates to this file.
 
 ---
 
-## Product Narrative (What the UI must convey at a glance)
+## Product Narrative
 
-1. Users **stake weETH** (principal) → principal is **safe** and **never used** to bet.
-2. A **Yield Credits** balance accrues from the principal (demo may simulate APR).
-3. Users **spend Yield Credits only** to make predictions on real-world events.
-4. **Two game modes**: Manual (user places bets) or Automated (Claude researches and bets automatically).
-5. Users **level up** and **earn achievements** (NFT-ready designs) for skill, accuracy, and consistency.
-6. Users **withdraw principal anytime**; wins and losses only affect Yield Credits.
+**The Core Loop:**
+1. Users stake **weETH** (principal) → principal is **SAFE** and never used to bet
+2. **Yield Credits (YC)** accrue from principal (currently simulated at 5% APR)
+3. Users spend **YC only** to make predictions on binary YES/NO markets
+4. **Two game modes**: Manual (user places bets) or Automated (Claude AI trades automatically)
+5. Users **level up** and earn **achievements** for accuracy, skill, and consistency
+6. Users **withdraw principal anytime**; wins/losses only affect YC balance
 
-The UI must make this loop immediately obvious without reading documentation.
+**UI Goal:** Make this loop immediately obvious without documentation.
 
 ---
 
-## Feature Specification (Complete, precise)
+## Current Implementation Status
 
-### A) Wallet + EtherFi Integration
+### ✅ FULLY IMPLEMENTED (90-100%)
 
-- Connect wallet with a first-class, safe-feeling flow.
-- Read and display **weETH** balance (mainnet read-only if needed).
-- Clear separation of two balances, always visible:
-  - **Principal (weETH)**: marked SAFE, non-spendable for bets, withdrawable.
-  - **Yield Credits (YC)**: spendable in predictions, detachable from principal.
-- APR panel:
-  - If live APR not available, show **“Simulated APR for Demo”** and an information tooltip explaining it.
-- EtherFi visual acknowledgment:
-  - Small branded “Powered by EtherFi (weETH)” strip with brief explainer tooltip.
+#### Core Infrastructure
+- **Next.js 16** with App Router and TypeScript
+- **Wagmi 2.19 + Viem 2.38** for Web3 integration
+- **RainbowKit 2.2** for wallet connection
+- **Prisma 6.19** with SQLite database
+- **Tailwind CSS 4** with custom dark theme design system
+- **Framer Motion 12** for animations
+- **Anthropic Claude Haiku 4.5** API integration
 
-### B) Vault & Yield Credits (Conceptual, minimal logic)
+#### Wallet & Authentication
+- Multi-wallet support (MetaMask, WalletConnect, Coinbase, etc.)
+- Wallet connection/disconnection flows
+- Address display with ENS resolution capability
+- Network validation (hardcoded to Sepolia testnet)
+- Automatic user creation on first interaction
 
-- Deposit/Withdraw interactions:
-  - Deposit: approves and deposits weETH to the “Game Vault” (mock/test deployment permissible).
-  - Withdraw: returns weETH principal; YC unaffected.
-- Yield Credits model:
-  - YC accrues over time based on principal (can be simulated).
-  - YC cannot be transferred; only spent in predictions and credited on wins.
-  - UI shows a “flow” animation to reinforce accrual.
+#### Markets & Prediction Gameplay
+- Admin can create binary YES/NO prediction markets
+- Market cards display: question, difficulty (1-5), close time, pools, implied odds
+- Users can browse active and resolved markets
+- Bet placement with YC balance validation
+- Position tracking (active and claimed)
+- Market resolution by admin (YES/NO/CANCEL outcomes)
+- Claim winnings flow with payout calculation
+- 8 demo markets seeded with varied topics
 
-### C) Prediction Gameplay
+#### Yield Credits System
+- YC balance tracking per user (database-backed)
+- New users start with 1000 YC for demo purposes
+- YC spent/won tracking with full audit trail
+- YC cannot be transferred (only spent or won)
+- Simulated APR (5% hardcoded in config)
+- YC Meter component with visual indicators
 
-- Market format: binary questions (YES/NO).
-- Market card content:
-  - Title, concise question, close time, difficulty (1–5), source/origin if relevant.
-  - YC pools for YES and NO (visible, even if mocked).
-- Bet ticket:
-  - Shows user YC balance, input YC amount, selected side, implied expected payout (simple calculation).
-  - Displays a **probability hint** and a **short educational tip** from Claude (see Claude section).
-  - Confirm interaction with gentle haptics and micro-success animation.
-- Resolution:
-  - Admin tool or timed closure to set outcomes (mock acceptable).
-  - Claim flow transfers YC winnings to the user’s YC balance.
-  - Clean receipts/notifications with a link to the “My Quests” view.
+#### Player Progression
+- **XP System**: +10 for bets, +20 for wins, +50 for 3-win streaks, +30 for quests
+- **Level System**: `level = sqrt(xp / 100)` with quadratic thresholds
+- **Skill Metrics**:
+  - Accuracy: `wins / totalBets * 100`
+  - Yield Efficiency: `(ycWon - ycSpent) / ycSpent * 100`
+  - Wisdom Index: `(accuracy * 0.5) + (yieldEfficiency * 0.3) + (streakBonus * 0.2)`
+- Streak tracking (consecutive wins)
 
-### D) Game Modes (Manual vs Automated)
+#### Achievements System
+- 7 achievement types with rarity tiers (Common → Legendary):
+  - FIRST_BLOOD: Place first bet (Common)
+  - HAT_TRICK: 3 wins in a row (Rare)
+  - SHARPSHOOTER: >60% accuracy with 10+ bets (Epic)
+  - QUEST_MASTER: Complete 5 Claude quests (Rare)
+  - DIAMOND_HANDS: Withdraw after 7 days (Uncommon)
+  - WHALE: Deposit >1 weETH (Rare)
+  - ORACLE: >75% accuracy with 20+ bets (Legendary)
+- Achievement checking triggered after relevant actions
+- Achievement earned modal with confetti animation
+- Achievement badges on profile (earned vs locked states)
 
-**Manual Mode:**
-- User browses prediction markets and places bets manually
-- Full control over which markets to bet on and how much YC to wager
-- Claude can still provide probability hints when placing individual bets
+#### Claude AI Integration
+1. **Quest Generation** (`POST /api/quests/generate`)
+   - Generates 3 personalized quests per request
+   - Adaptive difficulty based on user accuracy
+   - JSON-only responses with structured data
+   - Quest storage in database
 
-**Automated Mode:**
-- Claude acts as an AI trading agent that researches markets and places bets automatically
-- User sets risk preferences:
-  - Risk level: Low (conservative), Medium (balanced), High (aggressive)
-  - Max bet per market (YC amount)
-  - Minimum confidence threshold (%)
-- Claude performs automated research:
-  - Fetches current data online about market questions
-  - Analyzes trends, factors, and information
-  - Makes predictions with confidence scores
-  - Places bets automatically when confidence exceeds threshold
-- Dashboard shows:
-  - Active automated bets count
-  - Total YC deployed
-  - Estimated returns
+2. **Probability Hints** (`POST /api/claude/probability-hint`)
+   - Returns probability (0-1), rationale, educational tip
+   - Displayed in BetTicket component
+   - Cached per market for performance
+
+3. **Automated Predictions** (`POST /api/gamemode/predict`)
+   - Claude analyzes market questions
+   - Returns YES/NO prediction with confidence score
+   - Automatically places bets if confidence meets threshold
+   - Respects risk level settings
+
+#### Game Modes
+- **Manual Mode**: User browses and places bets manually
+- **Automated Mode**: Claude researches and bets automatically
+  - Risk level selector (Low/Medium/High)
+  - Max bet per market setting
+  - Min confidence threshold slider
   - Enable/disable toggle
-- Warning: Users should monitor YC balance and understand automated trading carries risk
+  - Stats dashboard (active bets, YC deployed, estimated returns)
 
-### E) Player Progression & Achievements
+#### Leaderboards
+- Three tabs: Accuracy Leaders, Wisdom Index Leaders, Quest Masters
+- Pagination (20 per page)
+- User search by address/ENS
+- Current user highlighting
+- Opt-in/opt-out toggle in profile
+- Minimum participation threshold
 
-- XP and Level:
-  - XP rules: award for placing bets, additional for correct outcomes, bonus for streaks and completing Claude quests.
-  - Display: smooth progress bar; show next reward threshold clearly.
-- Achievements (NFT-ready designs):
-  - First Bet, 3 Wins in a Row, >60% Accuracy, First Claude Quest Completed, First Withdraw, etc.
-  - Each achievement has a name, icon, rarity tag, and a one-line meaning (“Proof of Consistency: 3 consecutive wins”).
-  - Earn animation: badge pop-in with subtle celebratory confetti.
-- Accuracy & Skill indices:
-  - Accuracy (% correct).
-  - Yield Efficiency (YC profit relative to YC spent).
-  - Wisdom Index (weighted composite of accuracy, streaks, and time horizon participation). Formula can be mock but must be consistent.
+#### Profile Page
+- User stats: level, XP, accuracy, wisdom index
+- Total bets, wins, losses display
+- YC balance and principal display
+- Achievement grid with earned/locked states
+- Display name setting
+- Leaderboard visibility toggle
+- Betting history (basic)
 
-### F) Leaderboards
+#### Admin Panel
+- Create new markets
+- Resolve markets with outcome selection
+- Demo mode setup button (seeds data)
+- Gated by admin address (simple check)
 
-- Tabs:
-  - Accuracy Leaders.
-  - Wisdom Index Leaders.
-  - Quest Masters (most Claude quests completed).
-- Row contents: avatar, ENS or shortened address, key metric, subtle change indicator.
-- Anti-spam: ignore accounts with insufficient sample size; include a note about minimum participation.
-- Privacy: make ranking optional; allow opt-out toggle in profile.
+#### Demo Mode
+- Auto-generates realistic user stats for new users
+- Seeds 8 diverse prediction markets
+- Auto-generates 2-3 common achievements
+- 1000 YC starting balance
+- 1.5 weETH simulated principal
+- One-click setup via admin panel
 
-### G) Portfolio Analytics (Concise and meaningful)
+#### UI/UX
+- Dark theme with cyan/teal accents (EtherFi colors)
+- Responsive design (mobile, tablet, desktop)
+- WCAG AA accessibility compliance
+- Keyboard navigation support
+- Focus states always visible
+- Loading states and skeleton loaders
+- Toast notification system
+- Empty states with CTAs
+- Tooltips for educational content
+- Motion respects `prefers-reduced-motion`
 
-- Time series mini-chart: Principal vs YC over time.
-- Allocation chart: YC deployed YES vs NO in the current period.
-- Outcomes summary: total YC spent, redeemed, net change.
-- “Insights” slot: 1–2 AI-generated hints aligned with recent behavior (no financial advice).
+### ⚠️ PARTIALLY IMPLEMENTED (50-89%)
 
-### H) Education Layer
+#### Vault & Principal Management
+- **Status**: UI complete, contracts exist but NOT deployed
+- VaultCard component displays principal and YC balances
+- DepositModal and WithdrawModal components built
+- GameVault.sol contract written (~120 lines)
+- MockWeETH.sol contract written (~45 lines)
+- **GAP**: Contracts have placeholder addresses (0x0 in config)
+- **GAP**: No deployment scripts or mainnet deployment
+- **GAP**: Frontend uses MockWeETH, not real EtherFi weETH
 
-- Tooltips and help:
-  - Principal vs YC separation explained succinctly.
-  - “No-loss” caveat: contracts/protocol risk exists in real life; demo uses simplified logic.
-- Onboarding checklist:
-  - Connect wallet → Deposit weETH → Generate quests → Place first YC bet → Resolve → Claim YC → Withdraw principal.
-- Inline, non-patronizing, consistent tone.
+#### Portfolio Analytics
+- **Status**: Components exist, data collection incomplete
+- PortfolioAnalytics component built with Recharts
+- Basic time series tracking
+- **GAP**: Limited historical data collection
+- **GAP**: AI-generated insights not fully implemented
+
+#### Education Layer
+- **Status**: Tooltips exist, onboarding flow not interactive
+- Tooltips on key concepts (Principal, YC, Wisdom Index, etc.)
+- **GAP**: No interactive onboarding checklist in UI
+- **GAP**: Documented in TESTING.md but not built as modal
+
+#### Quest System
+- **Status**: Claude generates quests, quest-to-market linking incomplete
+- Quest generation works via Claude API
+- Quest storage in database
+- **GAP**: Optional marketId field not fully utilized
+- **GAP**: Quests don't directly suggest specific markets to bet on
+- **GAP**: Feedback mechanism exists but not fully featured
+
+#### Daily Rewards
+- **Status**: Components and endpoints exist, not integrated
+- DailyRewards component built
+- API endpoint exists
+- **GAP**: Not integrated into main gameplay UI
+- **GAP**: No visible claim flow
+
+### ❌ NOT IMPLEMENTED / MOCKED
+
+#### Real EtherFi Integration
+- Uses MockWeETH instead of real weETH contract
+- APR is simulated (5% hardcoded, not fetched from protocol)
+- No live yield accrual from actual EtherFi protocol
+- Vault contract not deployed to any network
+
+#### Smart Contract Deployment
+- GameVault.sol and MockWeETH.sol written but not deployed
+- No deployment scripts
+- No contract verification on Etherscan
+- No mainnet or testnet addresses configured
+
+#### Production Features
+- No proper admin authentication (uses simple address check)
+- No signature verification for admin actions
+- No rate limiting on API endpoints
+- No structured logging or error tracking (Sentry, etc.)
+- No database backups (SQLite is local/ephemeral)
+- No secrets management (API keys in .env.local)
+- No monitoring or observability
+
+#### NFT Achievement Minting
+- Achievement designs exist
+- No on-chain minting logic
+- Only database records
+
+#### Advanced Features (Post-Launch)
+- No oracle integration (Chainlink, Pyth, UMA)
+- No social features (comments, following, messaging)
+- No tournament mode
+- No referral system
+- No multi-chain support
+- No mobile app or PWA
+- No gasless transactions
+
+#### Player Class Assignment
+- Class types defined (Oracle, Degen, Analyst, Whale)
+- **NOT IMPLEMENTED**: Auto-assignment logic
+- **NOT IMPLEMENTED**: Field not populated in database
 
 ---
 
-## Page-Level UX Requirements (Exact)
+## Technology Stack (Actual)
 
-### 1) Home
+### Frontend
+- Next.js 16.0.1 (App Router)
+- TypeScript 5
+- React 19.2.0
+- Tailwind CSS 4 + PostCSS
+- Framer Motion 12.0.0
+- Lucide React 0.553 (icons)
+- Wagmi 2.19.2 + Viem 2.38.6
+- RainbowKit 2.2.9
+- Zustand 5.0.8 (state management)
+- React Hook Form 7.66.0 + Zod 4.1.12
+- Recharts 3.3.0
+- TanStack React Query 5.90.7
+- date-fns 4.1.0
 
-- Hero statement expressing the loop in one sentence.
-- Two primary actions: Connect Wallet, Go to Play.
-- A compact “How it Works” strip diagram (Principal → YC → Quests → XP/Badges → Withdraw).
-- EtherFi + Claude badges with brief one-line descriptions.
+### Backend
+- Next.js 16 API Routes (all endpoints)
+- No separate Node.js server
+- No Python FastAPI/Flask server
 
-### 2) Play
+### Database
+- SQLite (local development)
+- Prisma 6.19.0 (ORM)
+- @prisma/adapter-libsql 6.19.0
 
-- Left column: Vault Card, YC Meter, Deposit/Withdraw.
-- Right column: Game Mode Panel (Manual/Automated toggle with settings), Active Markets, Resolved Markets.
-- Bet Ticket slides in from right; dismissible with ESC/backdrop click.
-- Always show current YC prominently near action buttons.
+### Smart Contracts
+- Solidity 0.8.20
+- Hardhat 2.27.0
+- OpenZeppelin Contracts 5.4.0
+- **Status**: Written but NOT deployed
 
-### 3) Profile
+### External APIs
+- Anthropic Claude API (@anthropic-ai/sdk 0.68.0)
+- Model: Claude Haiku 4.5 (20251001)
+- RPC Provider: Configurable (Alchemy/Infura/public)
 
-- Header: ENS/avatar, address, class badge (Oracle/Degen/Analyst/Whale).
-- Subheader: Level, XP, Accuracy, Wisdom Index.
-- Sections:
-  - Achievements grid with hover tooltips.
-  - Portfolio analytics with time series charts and insights.
-  - Preferences: leaderboard opt-out, notifications, display name.
-- Demo Mode: New users automatically get dummy data (stats, achievements, bet history) for demonstration purposes.
-
-### 4) Leaderboard
-
-- Tabs for each metric.
-- Search by address/ENS.
-- Pagination or lazy load.
-- Highlight current user row.
-
-### 5) Admin (hidden or gated)
-
-- Create/close/resolve markets.
-- Seed demo data.
-- Toggle “Simulated APR” rate.
+### Development Tools
+- ESLint 9
+- Prettier 3.6.2
+- dotenv 17.2.3
 
 ---
 
-## Design System (No compromises)
+## Project Structure
 
-### Visual Theme
+```
+/home/user/hack-asu-etherfi/
+├── /app                          # Next.js App Router
+│   ├── /api                      # 28 API route endpoints
+│   │   ├── /achievements         # Achievement checking and retrieval
+│   │   ├── /analytics            # Portfolio analytics data
+│   │   ├── /claude               # Claude AI integration
+│   │   ├── /credits              # YC credit purchase
+│   │   ├── /demo                 # Demo mode setup
+│   │   ├── /gamemode             # Automated betting (predict, toggle, stats, settings)
+│   │   ├── /leaderboard          # Global leaderboards
+│   │   ├── /markets              # Market CRUD and resolution
+│   │   ├── /positions            # Bet placement and claiming
+│   │   ├── /quests               # Quest generation and management
+│   │   ├── /rewards              # Daily reward system
+│   │   ├── /users                # User profile and stats
+│   │   └── /yc                   # Yield Credits balance and accrual
+│   ├── /play                     # Main gameplay page
+│   ├── /profile                  # User profile page
+│   ├── /leaderboard              # Leaderboard page
+│   ├── /admin                    # Admin panel (gated)
+│   ├── page.tsx                  # Home page
+│   ├── layout.tsx                # Root layout
+│   └── globals.css               # Global styles
+├── /components                   # 32 React components
+│   ├── /ui                       # Design system (Button, Card, Input, Badge, etc.)
+│   ├── /wallet                   # WalletButton
+│   ├── /vault                    # VaultCard, Modals, YCMeter, DailyBonusCard
+│   ├── /markets                  # MarketCard, BetTicket, Lists
+│   ├── /quests                   # QuestCard, QuestsPanel, History, Feedback
+│   ├── /gamemode                 # GameModePanel
+│   ├── /profile                  # LevelBadge, AchievementBadge, Analytics
+│   ├── /credits                  # CreditsWidget, Store, DailyRewards
+│   ├── /leaderboard              # Leaderboard display
+│   ├── /layout                   # Header, Footer
+│   └── /providers                # Web3Provider
+├── /lib
+│   ├── /types                    # TypeScript type definitions
+│   ├── /hooks                    # Custom React hooks
+│   ├── /stores                   # Zustand stores (toast.ts)
+│   ├── /contracts                # Smart contract ABIs (GameVault, MockWeETH)
+│   ├── config.ts                 # Configuration and environment
+│   ├── wagmi.ts                  # Wagmi/Viem Web3 config
+│   ├── prisma.ts                 # Prisma client setup
+│   ├── achievements.ts           # Achievement logic and definitions
+│   └── (other utilities)
+├── /prisma
+│   └── schema.prisma             # Database schema (5 models)
+├── /contracts
+│   ├── GameVault.sol             # Vault contract (NOT deployed)
+│   └── MockWeETH.sol             # Mock weETH token (NOT deployed)
+├── /scripts                      # Demo data utility scripts
+├── /artifacts                    # Compiled contract artifacts
+├── package.json                  # Dependencies
+├── tsconfig.json                 # TypeScript config
+├── next.config.ts                # Next.js config
+├── tailwind.config.js            # Tailwind CSS config
+├── hardhat.config.js             # Hardhat config
+├── CLAUDE.md                     # This file
+├── SETUP.md                      # Setup instructions
+├── README.md                     # Project documentation
+├── TESTING.md                    # Testing guide
+└── .env.example                  # Environment variables template
+```
 
-- Aesthetic: modern DeFi + RPG hints. Minimalist, high-contrast, calm energy.
-- Palette:
-  - Background: near-black or deep navy.
-  - Surface cards: slightly lighter dark.
-  - Primary accent: vivid cyan/teal for EtherFi tie-in.
-  - Success: soft green.
-  - Warning: amber.
-  - Error: controlled red.
-  - Claude hint elements: subtle lavender highlights.
-- Gradients: reserved, linear and soft; never overpower core content.
+---
+
+## Database Schema (Prisma)
+
+### Models
+
+1. **User** (Primary entity)
+   - `id`: UUID
+   - `address`: Unique wallet address (lowercase)
+   - `ycBalance`: Float (Yield Credits)
+   - `principal`: Float (weETH deposited)
+   - `lastAccrualTime`: DateTime
+   - `xp`: Int
+   - `level`: Int
+   - `accuracy`: Float
+   - `totalBets`, `wins`, `losses`: Int
+   - `streakCount`: Int (consecutive wins)
+   - `ycSpent`, `ycWon`: Float
+   - `yieldEfficiency`, `wisdomIndex`: Float
+   - `completedQuests`: Int
+   - `showOnLeaderboard`: Boolean
+   - `displayName`: String (optional)
+   - `firstDepositAt`, `firstWithdrawAt`: DateTime (optional)
+
+2. **Market**
+   - `id`: UUID
+   - `question`: String (YES/NO question)
+   - `closeTime`: DateTime
+   - `difficulty`: Int (1-5)
+   - `yesPool`, `noPool`: Float
+   - `resolved`: Boolean
+   - `outcome`: String (YES/NO/CANCEL/null)
+   - Relations: positions[]
+
+3. **Position** (User's bet on a market)
+   - `id`: UUID
+   - `userId`, `marketId`: String
+   - `side`: String (YES/NO)
+   - `amount`: Float (YC staked)
+   - `claimed`: Boolean
+   - Relations: market
+
+4. **Quest** (Claude-generated quests)
+   - `id`: UUID
+   - `userId`, `marketId`: String (marketId optional)
+   - `title`, `question`: String
+   - `suggestedStake`: Float
+   - `difficulty`: Int (1-5)
+   - `learningOutcome`: String
+   - `closeTime`: DateTime
+   - `accepted`, `completed`: Boolean
+   - `outcome`, `feedback`, `suggestion`: String (optional)
+
+5. **Achievement**
+   - `id`: UUID
+   - `userId`: String
+   - `type`: String (ACHIEVEMENT_TYPE enum)
+   - `earnedAt`: DateTime
+   - Unique: [userId, type]
+
+---
+
+## API Routes (28 Total)
+
+### Achievements
+- `GET /api/achievements` - Get user's earned and locked achievements
+- `POST /api/achievements/check` - Check and award achievements
+
+### Analytics
+- `GET /api/analytics/[address]` - Get portfolio analytics data
+
+### Claude AI
+- `POST /api/claude/probability-hint` - Get probability hint for a market
+
+### Credits
+- `POST /api/credits/purchase` - Purchase YC (multiple payment methods)
+
+### Demo
+- `POST /api/demo/setup` - Initialize demo mode with seed data
+
+### Game Mode
+- `POST /api/gamemode/predict` - Automated prediction and betting
+- `GET /api/gamemode/stats` - Get automated betting statistics
+- `POST /api/gamemode/settings` - Save automated mode settings
+- `POST /api/gamemode/toggle` - Enable/disable automated mode
+
+### Leaderboard
+- `GET /api/leaderboard` - Get leaderboard data (filtered by type/page)
+
+### Markets
+- `GET /api/markets` - List all markets with optional filtering
+- `POST /api/markets` - Create new market (admin)
+- `PATCH /api/markets/:id/resolve` - Resolve market (admin)
+- `POST /api/markets/seed` - Seed demo markets
+- `POST /api/markets/auto-resolve` - Auto-resolve expired markets
+
+### Positions
+- `GET /api/positions` - Get user's positions
+- `POST /api/positions` - Place a bet on a market
+- `POST /api/positions/:id/claim` - Claim winnings
+
+### Quests
+- `POST /api/quests/generate` - Generate 3 personalized quests via Claude
+- `GET /api/quests/user` - Get user's quests
+- `POST /api/quests/accept` - Accept a quest
+- `POST /api/quests/feedback` - Get Claude feedback on quest result
+
+### Rewards
+- `GET /api/rewards/daily` - Check daily reward eligibility
+- `POST /api/rewards/daily/claim` - Claim daily bonus
+
+### Users
+- `GET /api/users/[address]` - Get/create user profile with demo data
+
+### Yield Credits
+- `GET /api/yc/balance` - Get YC balance (creates user if needed)
+- `POST /api/yc/accrue` - Simulate YC accrual from principal
+- `POST /api/yc/withdraw` - Withdraw YC (if implemented)
+- `POST /api/yc/update-principal` - Update principal balance
+
+---
+
+## Design System
+
+### Color Palette (Dark Theme)
+- **Background**: `#0a0f1a` (near-black)
+- **Surface**: `#131b2e` (dark navy)
+- **Primary**: `#00d4ff` (cyan/teal - EtherFi brand)
+- **Success**: `#4ade80` (soft green)
+- **Warning**: `#fbbf24` (amber)
+- **Error**: `#ef4444` (red)
+- **Claude/Secondary**: `#c4b5fd` (lavender)
 
 ### Typography
-
-- Headings: geometric, modern sans. Clear hierarchy (H1-H5).
-- Body: highly legible sans with generous line-height.
-- Numerics: tabular numerals for balances, pools, odds.
-- Never use more than 2 font families. Maintain consistent sizes and spacing.
+- Headings: Geometric modern sans
+- Body: Highly legible sans with generous line-height
+- Numerics: Tabular numerals for balances
+- Max 2 font families
 
 ### Layout & Spacing
+- 12-column responsive grid
+- 8px base spacing unit
+- Card padding: 16-24px
+- Max content width: 1200-1280px
 
-- 12-column responsive grid.
-- Base spacing unit: 8px scale.
-- Card padding minimum: 16–24px.
-- Max content width: 1200–1280px for readability.
+### Components
+- Buttons: Primary, secondary, subtle variants
+- Cards: Rounded, hover shadows, gradient variants
+- Inputs: Labels, helpers, error text
+- Tooltips: 1-2 lines, hover delay
+- Toasts: Auto-dismiss, bottom-center/top-right
 
-### Components & States
-
-- Cards: rounded medium radius, subtle shadow on hover, consistent header and body sections.
-- Buttons: primary (accent), secondary (outline), subtle (text). All with focus rings.
-- Inputs: clear labels, helper text, error text; numeric keypad for YC amounts on mobile.
-- Tabs: underline/indicator consistent; keyboard navigable.
-- Tooltips: concise, 1–2 lines, delay on hover.
-- Toasts: brief, bottom-center or top-right, dismissible.
-
-### Motion & Micro-interactions
-
-- Duration: 150–250ms, eased transitions.
-- YC accrual: breathing shimmer on meter.
-- Bet placement: subtle confirmation pulse on the market card.
-- Achievements: short confetti + badge scale-in; must be skippable.
-- Reduce motion preference respected.
+### Animations
+- Duration: 150-250ms with easing
+- YC accrual: Breathing shimmer effect
+- Achievements: Confetti + scale-in
+- Respect `prefers-reduced-motion`
 
 ### Accessibility
-
-- Meet or exceed WCAG AA contrast.
-- Full keyboard navigation.
-- Focus states always visible.
-- Live regions for dynamic updates (toasts, accrual changes).
-
-### Empty States & Skeletons
-
-- Provide instructive empty states with a single primary action.
-- Use animated skeletons for market lists and cards on initial load.
-
-### Copy & Tone
-
-- Short, confident, instructive.
-- Avoid jargon; when unavoidable, provide a tooltip.
-- No financial advice disclaimers where appropriate.
+- WCAG AA contrast (4.5:1 minimum)
+- Full keyboard navigation
+- Focus states always visible
+- ARIA labels on interactive elements
 
 ---
 
-## Claude Integration (Deterministic, JSON-only)
+## Known Issues & TODOs
 
-- Endpoints to generate:
-  - Automated prediction: researches market questions online, returns prediction with confidence score and reasoning
-  - Probability hint (optional for manual mode): returns a float 0–1 and a 1-paragraph rationale
-  - Betting decision: determines whether to place a bet based on risk settings and confidence threshold
-- Output contract:
-  - Always JSON, fixed fields, no prose outside JSON.
-  - Reject and retry if the format deviates.
-  - Example automated prediction response:
-    ```json
-    {
-      "prediction": "YES" | "NO",
-      "confidence": 0-100,
-      "reasoning": "brief explanation",
-      "shouldBet": true | false,
-      "suggestedAmount": number
-    }
-    ```
-- Inputs:
-  - Market question, close time, difficulty
-  - User risk settings (risk level, max bet, min confidence)
-  - Minimal user profile stats (wins/losses/accuracy/stakes)
-  - Never pass secrets or PII
-- Safety:
-  - Instruct Claude not to provide financial advice; it may provide educational hints only
-  - Warn users that automated mode carries risk and past performance doesn't guarantee future results
+### Critical (Blocks Production)
+1. **Smart Contracts Not Deployed**
+   - GameVault.sol and MockWeETH.sol written but addresses are 0x0
+   - No deployment scripts
+   - No testnet or mainnet deployment
+   - Frontend cannot interact with real contracts
 
----
+2. **Admin Authentication Inadequate**
+   - Simple address check from config (not secure)
+   - No signature verification
+   - TODO comments in `/app/api/markets/route.ts:85` and `/app/api/markets/[id]/resolve/route.ts:23`
 
-## Backend & Data (Basic / Mock acceptable)
+3. **Database Not Production-Ready**
+   - SQLite is local/ephemeral
+   - No backups or replication
+   - Would fail in production deployment
 
-### Backend Choice
+### High Priority
+4. **Automated Mode Settings Not Persisted**
+   - Settings UI exists but values logged only
+   - Should be stored in User model
+   - Missing fields: `automatedEnabled`, `riskLevel`, `maxBetPerMarket`, `minConfidence`
 
-- Use **Next.js API routes** for all backend endpoints where possible.
-- If a separate server is required, use **Python FastAPI or Flask**. Keep it minimal.
-- No custom Node.js servers beyond Next.js defaults.
+5. **Real EtherFi Integration Missing**
+   - Uses MockWeETH instead of real weETH
+   - APR is hardcoded (5%), not fetched from protocol
+   - No live yield accrual
 
-### Data Handling
+6. **Player Class Assignment Not Implemented**
+   - Types defined but not calculated/assigned
+   - Field not populated in database
 
-- Temporary storage acceptable (in-memory or lightweight DB).
-- Suggested logical entities (names only, not schemas):
-  - Users, Stats, Quests, Markets, Positions, Achievements.
-- Keep all write paths minimal and predictable.
-- Never store Claude prompts/responses containing secrets.
+### Medium Priority
+7. **Quest-to-Market Linking Incomplete**
+   - Quests generated but don't suggest specific markets
+   - Optional `marketId` field not fully utilized
 
-### Market Resolution
+8. **Daily Rewards Not Integrated**
+   - Component and endpoint exist
+   - Not visible in main gameplay UI
 
-- Demo: Admin or scheduled mock resolution is acceptable.
-- Indicate in UI that demo outcomes may be mocked.
-- Production note: oracles (Pyth/Chainlink/UMA) are future work; do not implement now.
+9. **Onboarding Checklist Not Built**
+   - Documented in TESTING.md
+   - No interactive modal in UI
 
----
+10. **Limited Error Handling**
+    - Generic error messages
+    - Some server errors leak details
+    - No structured logging
 
-## Non-Goals (Explicitly avoid)
+### Low Priority
+11. **No Automated Testing**
+    - Only manual testing guidance
+    - No unit, integration, or contract tests
 
-- Do not build complex AMMs or pricing engines.
-- Do not implement full NFT minting on-chain; design visuals and stubs only.
-- Do not integrate external wallets beyond the chosen connector set.
-- Do not add complex analytics beyond what is listed.
-- Do not add themes or skins beyond the primary theme.
+12. **No Caching Strategy**
+    - Claude API calls should be cached
+    - Probability hints mentioned to cache but unclear
 
----
-
-## Quality Criteria (What "done" looks like)
-
-- Users can connect a wallet, see real or read-only **weETH** balances, and deposit/withdraw to a demo vault.
-- YC accrues visually and is spendable; principal remains clearly separate and safe.
-- Users can toggle between Manual and Automated game modes with clear UI feedback.
-- In Manual mode, users can browse markets and place YC bets themselves.
-- In Automated mode, users can configure risk settings and Claude automatically researches and places bets.
-- Users can place a YC bet, see it in Active Markets, and later see a resolved outcome with the ability to claim YC.
-- Profile shows level, XP, accuracy, achievements grid with designed badges.
-- New users automatically receive dummy data (stats, achievements) for demo purposes.
-- Leaderboards display top users by Accuracy and Wisdom Index.
-- The interface is modern, consistent, accessible, and visually refined per this file.
+13. **No Rate Limiting**
+    - API endpoints can be spammed
+    - Claude API could be abused
 
 ---
 
-## After Completing Work
+## Environment Variables
 
-- Update this file **only** with any new constraints or next-step instructions required for future development.
-- Do **not** add status logs, test reports, or progress diaries.
-- Keep this file as the single source of truth for product requirements and UX standards.
+Required in `.env.local`:
 
----
+```bash
+# Database
+DATABASE_URL="file:./dev.db"
 
-## Phase-Wise Implementation Plan
+# Anthropic Claude AI
+ANTHROPIC_API_KEY="sk-ant-..."
 
-### Overview
+# Web3 (RainbowKit)
+NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID="your-project-id"
 
-This plan breaks down the entire project into 6 logical phases, each building upon the previous. Phases are designed to deliver incremental value and allow for early testing of core mechanics. Total estimated timeline: 4-6 weeks for a 2-3 person team.
+# Network (Sepolia testnet)
+NEXT_PUBLIC_CHAIN_ID="11155111"
 
----
+# Smart Contracts (currently 0x0 placeholders)
+NEXT_PUBLIC_WEETH_ADDRESS="0x0000000000000000000000000000000000000000"
+NEXT_PUBLIC_VAULT_ADDRESS="0x0000000000000000000000000000000000000000"
 
-### **PHASE 0: Project Bootstrap & Foundation** (Days 1-2)
+# Admin (simple address check - not secure)
+ADMIN_ADDRESS="0x..."
 
-**Goal:** Set up development environment, tooling, and basic project structure.
-
-#### Tasks:
-
-1. **Initialize Next.js Project**
-   - Create Next.js 14+ project with App Router
-   - Configure TypeScript with strict mode
-   - Set up ESLint and Prettier
-
-2. **Install Core Dependencies**
-   - Web3 libraries: `wagmi`, `viem`, `@rainbow-me/rainbowkit` or `@web3modal/wagmi`
-   - UI framework: `tailwindcss`, `framer-motion`, `lucide-react` or `heroicons`
-   - State management: `zustand` or React Context
-   - Charts: `recharts` or `chart.js`
-   - Form handling: `react-hook-form`, `zod`
-   - HTTP client: built-in `fetch` or `axios`
-
-3. **Project Structure Setup**
-
-   ```
-   /app
-     /api
-       /claude        # Claude AI endpoints
-       /markets       # Market CRUD
-       /quests        # Quest generation
-       /vault         # Deposit/withdraw logic
-     /(routes)
-       /page.tsx      # Home
-       /play
-       /profile
-       /leaderboard
-       /admin
-   /components
-     /ui              # Base components (Button, Card, Input, etc.)
-     /wallet          # Wallet connection components
-     /vault           # Vault and YC components
-     /markets         # Market cards, bet tickets
-     /quests          # Quest cards and flows
-     /profile         # Profile sections
-     /leaderboard     # Leaderboard tables
-   /lib
-     /contracts       # Smart contract ABIs and addresses
-     /utils           # Helper functions
-     /hooks           # Custom React hooks
-     /stores          # State management
-     /types           # TypeScript types
-   /public
-     /images
-     /icons
-   /styles
-   ```
-
-4. **Design System Foundation**
-   - Configure Tailwind with custom color palette (cyan/teal primary, dark theme)
-   - Create base component library: Button, Card, Input, Badge, Tooltip, Toast
-   - Set up typography scale and spacing system (8px base)
-   - Configure animation variants for framer-motion
-
-5. **Environment Configuration**
-   - Create `.env.local` template with required variables:
-     - `NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID`
-     - `NEXT_PUBLIC_CHAIN_ID` (Sepolia testnet for demo)
-     - `ANTHROPIC_API_KEY` (for Claude integration)
-     - `NEXT_PUBLIC_WEETH_ADDRESS`
-     - `NEXT_PUBLIC_VAULT_ADDRESS`
-   - Set up RPC providers (Alchemy, Infura, or public)
-
-**Deliverable:** Empty Next.js app runs locally, design system components render correctly, wallet connection modal appears.
+# Demo Configuration
+NEXT_PUBLIC_DEMO_MODE="true"
+NEXT_PUBLIC_SIMULATED_APR="5"
+```
 
 ---
 
-### **PHASE 1: Wallet Integration & Basic UI Shell** (Days 3-5)
+## Quality Criteria (Demo Readiness)
 
-**Goal:** Users can connect wallet, see basic navigation, and view placeholder pages.
+### ✅ ACHIEVED
+- Users can connect wallet with RainbowKit
+- Demo mode provides realistic user data automatically
+- Users can browse and place YC bets on markets
+- Admin can create and resolve markets
+- Users can claim winnings after resolution
+- Profile shows level, XP, accuracy, achievements
+- Leaderboards display top users by metrics
+- Interface is modern, consistent, accessible
+- Manual and Automated game modes toggle
+- Claude AI generates quests and probability hints
 
-#### Tasks:
+### ⚠️ PARTIAL
+- weETH balance reading (uses mock contract)
+- YC accrues visually (simulated, not real yield)
+- Deposit/withdraw UI exists (contracts not deployed)
 
-1. **Wallet Connection System**
-   - Implement RainbowKit or Web3Modal provider wrapper
-   - Create `WalletButton` component with connection states (disconnected, connecting, connected)
-   - Show connected address with ENS resolution (if available)
-   - Display network indicator and switch network functionality
-   - Handle wallet disconnection gracefully
-
-2. **Layout & Navigation**
-   - Create root layout with header/navigation
-   - Navigation links: Home, Play, Profile, Leaderboard
-   - Mobile-responsive hamburger menu
-   - Persistent wallet connection status in header
-   - Footer with EtherFi and Claude branding
-
-3. **Home Page (Static)**
-   - Hero section with tagline: "Predict with Yield, Keep Your Principal Safe"
-   - Two CTAs: "Connect Wallet" and "Enter Play"
-   - "How It Works" diagram (static SVG or images):
-     - Step 1: Deposit weETH → Step 2: Earn YC → Step 3: Predict & Win → Step 4: Withdraw Anytime
-   - EtherFi + Claude partner badges with tooltips
-   - Empty state: prompt to connect wallet
-
-4. **Page Shells (Empty States)**
-   - `/play`: Show skeleton layout (left column for vault, right for markets)
-   - `/profile`: Show disconnected state with "Connect Wallet" prompt
-   - `/leaderboard`: Show empty table structure with tabs
-   - `/admin`: Hidden route, basic auth check (hardcoded admin address)
-
-5. **Basic Hooks**
-   - `useWallet`: Abstract wallet connection state
-   - `useWeETHBalance`: Read weETH token balance from contract
-   - `useChainValidation`: Ensure user is on correct network
-
-**Deliverable:** Users can navigate the app, connect/disconnect wallet, see their weETH balance, and view empty page structures.
+### ❌ NOT ACHIEVED
+- Real EtherFi weETH integration
+- Live APR from protocol
+- On-chain contract interactions
+- Production-grade authentication
+- Production-grade database
+- Automated testing coverage
 
 ---
 
-### **PHASE 2: Smart Contracts & Vault Integration** (Days 6-10)
+## Next Steps (Priority Order)
 
-**Goal:** Deploy minimal smart contracts, enable deposit/withdraw of weETH, mock YC accrual.
-
-#### Tasks:
-
-1. **Smart Contract Development**
-   - **GameVault.sol** (minimal, ~100 lines):
-     - Accept weETH deposits (ERC-20 transferFrom)
-     - Track user principal balances (mapping)
-     - Allow withdrawals of principal only
-     - Emit events: Deposit, Withdraw
-     - Include emergency pause mechanism
-   - **YieldCredits.sol** (off-chain friendly):
-     - Can be entirely off-chain for demo, or minimal on-chain ledger
-     - Store YC balances (mapping address => uint256)
-     - Functions: mint (admin only), burn (on bet placement), transfer (internal only)
-   - Deploy to Sepolia testnet using Hardhat or Foundry
+### For Demo Improvement
+1. **Deploy Smart Contracts to Sepolia Testnet**
+   - Write deployment script
+   - Deploy GameVault.sol and MockWeETH.sol
+   - Update addresses in config
    - Verify contracts on Etherscan
 
-2. **Contract Integration (Frontend)**
-   - Add contract ABIs to `/lib/contracts`
-   - Create `useVault` hook:
-     - `deposit(amount)`: approve weETH, call vault deposit
-     - `withdraw(amount)`: call vault withdraw, update UI
-     - `getPrincipalBalance()`: read user's deposited weETH
-   - Create `useYieldCredits` hook:
-     - `getYCBalance()`: read from API or contract
-     - `ycAccrualRate`: calculated from principal (mock 5% APR for demo)
-   - Handle transaction states: idle, pending, success, error
-   - Toast notifications for transaction lifecycle
+2. **Complete Onboarding Flow**
+   - Build interactive checklist modal
+   - Track completion in user record
+   - Show on first visit
 
-3. **Vault UI Components**
-   - **VaultCard** component:
-     - Display Principal (weETH) balance with "SAFE" badge
-     - Display YC balance with accrual animation (shimmer effect)
-     - APR indicator: "Simulated APR: 5% for Demo" with info tooltip
-     - Deposit button: opens modal with amount input
-     - Withdraw button: opens modal with max principal amount
-   - **DepositModal**:
-     - Input weETH amount (with max button)
-     - Show approval step if needed
-     - Show deposit confirmation
-     - Display gas estimate
-   - **WithdrawModal**:
-     - Input weETH amount (max = deposited principal)
-     - Confirm withdrawal
-     - Warn user: "YC balance unaffected"
-   - YC meter: circular progress or linear bar with breathing animation
+3. **Integrate Daily Rewards**
+   - Add DailyRewards component to Play page
+   - Make claim flow visible and functional
 
-4. **YC Accrual Logic (Simulated)**
-   - API route: `POST /api/vault/accrue`
-     - Calculate YC based on: `principal * APR * timeElapsed / 31536000`
-     - Store in database or in-memory store
-     - Return updated YC balance
-   - Frontend: poll or use interval to update YC display every 10 seconds
-   - Store `lastAccrualTime` to calculate delta correctly
+4. **Complete Quest-to-Market Linking**
+   - Quests should suggest specific markets
+   - Show "Recommended by Claude" badge on markets
 
-5. **Database Setup (Lightweight)**
-   - Choose: SQLite (local), PostgreSQL (Vercel), or in-memory (Redis/Upstash)
-   - Schema:
-     - `users`: address, ycBalance, principal, lastAccrualTime, xp, level, stats
-     - `markets`: id, question, closeTime, difficulty, yesPool, noPool, resolved, outcome
-     - `positions`: id, userId, marketId, side, amount, claimed
-     - `quests`: id, userId, marketId, difficulty, accepted, completed
-     - `achievements`: id, userId, type, earnedAt
+### For Production Readiness
+5. **Implement Proper Authentication**
+   - Signature verification for admin actions
+   - Replace simple address checks
 
-**Deliverable:** Users can deposit weETH, see YC accruing in real-time, and withdraw principal. Vault card displays both balances clearly.
+6. **Upgrade Database**
+   - Migrate from SQLite to PostgreSQL
+   - Implement backup strategy
+   - Add database migrations
+
+7. **Add Rate Limiting & Security**
+   - Implement rate limiting on all API routes
+   - Add structured logging (Sentry, Datadog, etc.)
+   - Implement secrets management
+
+8. **Real EtherFi Integration**
+   - Replace MockWeETH with real weETH contract
+   - Fetch live APR from EtherFi protocol
+   - Implement real yield accrual
+
+9. **Testing & QA**
+   - Write unit tests for utilities
+   - Write integration tests for API routes
+   - Write contract tests for GameVault
+   - Set up CI/CD with automated testing
+
+10. **Monitoring & Observability**
+    - Add error tracking (Sentry)
+    - Add performance monitoring
+    - Set up alerting
 
 ---
 
-### **PHASE 3: Markets & Prediction Gameplay** (Days 11-16)
-
-**Goal:** Create, display, and interact with prediction markets. Users can place YC bets.
-
-#### Tasks:
-
-1. **Market Data Management**
-   - API routes:
-     - `GET /api/markets`: List all markets (filter: active, resolved)
-     - `POST /api/markets`: Admin creates market (question, closeTime, difficulty)
-     - `PATCH /api/markets/:id/resolve`: Admin resolves market (outcome: YES/NO)
-   - Seed 5-10 demo markets with varied topics and difficulties
-
-2. **Market UI Components**
-   - **MarketCard** component:
-     - Question title (truncated with tooltip)
-     - Difficulty indicator (1-5 stars or badges)
-     - Close time countdown
-     - YES/NO pool sizes (mocked or real)
-     - Implied odds display (e.g., "YES: 65% | NO: 35%")
-     - "Place Bet" button
-     - Status badge: Active (green), Closing Soon (amber), Resolved (gray)
-   - **MarketsList**:
-     - Tabs: Active Markets, Resolved Markets
-     - Skeleton loaders on initial fetch
-     - Empty state: "No markets available. Check back soon!"
-
-3. **Bet Placement Flow**
-   - **BetTicket** component (slide-in panel from right):
-     - Market question summary
-     - User's current YC balance (large, prominent)
-     - Side selector: YES / NO (radio buttons or toggle)
-     - Amount input (numeric, validate <= YC balance)
-     - Expected payout calculation: `amount * (totalPool / sidePool)`
-     - Claude hint section (fetch on open):
-       - Probability estimate (e.g., "58% YES")
-       - Educational tip (1 sentence, e.g., "Consider recent trends in similar events")
-     - Confirm button with loading state
-     - Dismiss on ESC or backdrop click
-   - API: `POST /api/positions`
-     - Validate YC balance
-     - Deduct YC from user
-     - Create position record
-     - Update market pools
-     - Award XP (+10 for placing bet)
-
-4. **Market Resolution & Claiming**
-   - Admin panel: `/admin/markets`
-     - List all markets with resolve buttons
-     - Resolve modal: select outcome (YES/NO/CANCEL)
-     - Trigger resolution, calculate winners
-   - API: `POST /api/positions/:id/claim`
-     - Check if market resolved
-     - Check if user won
-     - Calculate payout: `stakedAmount * (totalPool / winningSidePool)`
-     - Credit YC to user
-     - Mark position as claimed
-     - Award XP (+20 for correct prediction, +5 for streak bonus)
-   - **ClaimButton** on resolved market cards:
-     - Show "Claim YC" if won and unclaimed
-     - Show "Lost" if lost (disabled)
-     - Show confetti animation on claim success
-
-5. **Probability Hints (Claude Integration - Basic)**
-   - API: `POST /api/claude/probability-hint`
-     - Input: market question, difficulty, user stats (optional)
-     - Call Anthropic API with structured prompt:
-       ```
-       Return JSON only:
-       {
-         "probability": 0.0-1.0,
-         "rationale": "one sentence",
-         "tip": "one educational sentence"
-       }
-       ```
-     - Cache response for 5 minutes per market
-   - Display in BetTicket with subtle lavender highlight
-
-**Deliverable:** Users can browse markets, place YC bets, see active positions, and claim winnings after resolution. Admin can create and resolve markets.
-
----
-
-### **PHASE 4: Game Modes & Automated Claude Trading** (Days 17-21)
-
-**Goal:** Implement Manual and Automated game modes. In Automated mode, Claude researches markets and places bets automatically.
-
-#### Tasks:
-
-1. **Game Mode System**
-   - Create **GameModePanel** component:
-     - Two-column mode selector (Manual vs Automated)
-     - Manual: Shows description and active mode indicator
-     - Automated: Shows settings panel and stats dashboard
-     - Visual distinction with icons (Hand for Manual, Bot for Automated)
-
-2. **Automated Mode Settings**
-   - Risk level selector (Low, Medium, High):
-     - Low: Conservative betting, >70% confidence threshold
-     - Medium: Balanced approach, >60% confidence threshold
-     - High: Aggressive betting, >50% confidence threshold
-   - Max bet per market (YC amount input)
-   - Minimum confidence threshold (slider 50-90%)
-   - Save settings button
-
-3. **Automated Betting Backend**
-   - API: `POST /api/gamemode/toggle`
-     - Enable/disable automated mode
-     - Store user settings
-   - API: `POST /api/gamemode/predict`
-     - Input: marketId, address, riskLevel
-     - Call Anthropic API with structured prompt:
-       ```
-       Analyze this prediction market question:
-       - Research the question online
-       - Consider recent trends and data
-       - Return JSON:
-       {
-         "prediction": "YES" | "NO",
-         "confidence": 0-100,
-         "reasoning": "brief explanation",
-         "shouldBet": true | false,
-         "suggestedAmount": number
-       }
-       ```
-     - If shouldBet is true and confidence meets threshold:
-       - Automatically place bet on market
-       - Update user YC balance
-       - Track automated position
-   - API: `GET /api/gamemode/stats`
-     - Return active automated bets count
-     - Total YC deployed
-     - Estimated returns based on current pools
-
-4. **Automated Mode UI**
-   - Status banner (Active/Inactive) with enable/disable toggle
-   - Stats cards showing:
-     - Active bets count
-     - YC deployed amount
-     - Estimated return (profit/loss)
-   - Warning message about risks
-   - Settings collapsible panel
-
-5. **Demo Data Generation**
-   - Update `GET /api/users/:address` endpoint
-   - When creating new user, generate dummy data:
-     - Random stats (10-30 bets, 50-80% accuracy)
-     - Calculated XP, level, wins, losses
-     - YC spent/won amounts
-     - 2-3 common achievements (FIRST_BET, HAT_TRICK)
-   - Ensures profile never shows empty state for demo
-
-**Deliverable:** Users can toggle between Manual and Automated modes. Automated mode uses Claude to research and place bets automatically. New users see populated profiles with dummy data.
-
----
-
-### **PHASE 5: Player Progression & Social Features** (Days 22-27)
-
-**Goal:** Implement XP, levels, achievements, and leaderboards.
-
-#### Tasks:
-
-1. **XP & Leveling System**
-   - XP awards:
-     - Place bet: +10 XP
-     - Win bet: +20 XP
-     - 3-win streak: +50 XP bonus
-     - Complete Claude quest: +30 XP
-     - First deposit: +15 XP
-     - First withdrawal: +10 XP
-   - Level formula: `level = floor(sqrt(xp / 100))`
-   - Level thresholds: 0, 100, 400, 900, 1600, 2500... (quadratic)
-   - API: `PATCH /api/users/:address/xp`
-     - Add XP, recalculate level
-     - Check for level-up, trigger achievement check
-   - **LevelBadge** component:
-     - Display current level with icon
-     - Progress bar to next level
-     - Tooltip: "Next level at X XP"
-
-2. **Achievement System**
-   - Define achievements:
-     - "First Blood": Place first bet (Common)
-     - "Hat Trick": 3 wins in a row (Rare)
-     - "Sharpshooter": >60% accuracy with 10+ bets (Epic)
-     - "Quest Master": Complete 5 Claude quests (Rare)
-     - "Diamond Hands": Withdraw after 7 days (Uncommon)
-     - "Whale": Deposit >1 weETH (Rare)
-     - "Oracle": >75% accuracy with 20+ bets (Legendary)
-   - API: `POST /api/achievements/check`
-     - Run after each XP-awarding action
-     - Check conditions for all achievements
-     - Award if conditions met, mark earnedAt
-   - **AchievementBadge** component:
-     - Icon (unique per achievement)
-     - Rarity color: Common (gray), Uncommon (green), Rare (blue), Epic (purple), Legendary (gold)
-     - Name and description
-     - Earned timestamp
-   - **AchievementEarnedModal**:
-     - Confetti animation
-     - Badge scale-in effect
-     - "You earned [name]!" message
-     - Click to dismiss (also skippable after 3 seconds)
-
-3. **Skill Metrics**
-   - Calculate on each bet resolution:
-     - Accuracy: `correctBets / totalBets * 100`
-     - Yield Efficiency: `(ycWon - ycSpent) / ycSpent * 100`
-     - Wisdom Index: `(accuracy * 0.5) + (yieldEfficiency * 0.3) + (streakBonus * 0.2)`
-   - Display on profile and leaderboard
-   - Store in user record, update after each claim
-
-4. **Profile Page**
-   - Header:
-     - ENS name or shortened address
-     - Avatar (Jazzicon or ENS avatar)
-     - Class badge (auto-assigned based on behavior):
-       - Oracle: high accuracy, moderate stakes
-       - Degen: high stakes, lower accuracy
-       - Analyst: high wisdom index
-       - Whale: high principal deposited
-   - Stats section:
-     - Level, XP, Accuracy, Wisdom Index
-     - Total bets, wins, losses
-     - YC profit/loss
-   - Achievements grid:
-     - Show earned achievements with full color
-     - Show locked achievements as grayscale with "???"
-     - Hover for tooltips
-   - History timeline:
-     - List of completed quests and bets
-     - Show outcome, YC change, XP earned
-     - Pagination or infinite scroll
-   - Preferences:
-     - Toggle: Show on leaderboard (default: true)
-     - Toggle: Email notifications (if email collected)
-     - Input: Display name (optional)
-
-5. **Leaderboard Page**
-   - Three tabs:
-     - Accuracy Leaders: sort by accuracy (min 10 bets)
-     - Wisdom Index Leaders: sort by wisdom index (min 10 bets)
-     - Quest Masters: sort by completed quests count
-   - Table columns:
-     - Rank (#1, #2, ...)
-     - Avatar
-     - Address (ENS or shortened)
-     - Metric value
-     - Change indicator (up/down/same since last period)
-   - Search bar: filter by address or ENS
-   - Highlight current user row (if opted in)
-   - Pagination: 20 per page
-   - Empty state: "Not enough participants yet. Be the first!"
-
-**Deliverable:** Users level up, earn animated achievement badges, view detailed stats on profile, and compete on leaderboards.
-
----
-
-### **PHASE 6: Portfolio Analytics & Final Polish** (Days 28-32)
-
-**Goal:** Add portfolio analytics, onboarding checklist, final UI polish, and demo readiness.
-
-#### Tasks:
-
-1. **Portfolio Analytics**
-   - Data collection:
-     - Track principal and YC balances over time (snapshot daily or on each action)
-     - Track bet allocation (YES vs NO) per day/week
-   - API: `GET /api/analytics/:address`
-     - Return time series: `[{ date, principal, yc }, ...]`
-     - Return allocation: `{ yes: X, no: Y }`
-     - Return outcomes summary: `{ spent, won, net }`
-   - **AnalyticsPanel** on `/profile`:
-     - Line chart: Principal vs YC over time (recharts)
-     - Pie/donut chart: YC allocation YES vs NO
-     - Summary cards: Total Spent, Total Won, Net YC Change
-     - "Insights" box:
-       - Call Claude API with user behavior data
-       - Display 1-2 hints (e.g., "You tend to favor YES bets. Try diversifying.")
-       - Educational, not financial advice
-
-2. **Onboarding Checklist**
-   - Show modal on first visit (localStorage flag: `hasSeenOnboarding`)
-   - Checklist items (track completion in user record):
-     - Connect wallet ✓
-     - Deposit weETH ✓
-     - Generate quests ✓
-     - Place first YC bet ✓
-     - Resolve a market (wait) ✓
-     - Claim YC winnings ✓
-     - Withdraw principal ✓
-   - Each completed step shows green checkmark
-   - "Skip Tutorial" option
-   - Re-accessible from Help menu
-
-3. **Education Layer (Tooltips & Help)**
-   - Add tooltips throughout:
-     - Principal: "Your deposited weETH. Always safe and withdrawable."
-     - YC: "Yield Credits from your principal. Spend on predictions, never lose principal."
-     - Wisdom Index: "Composite score: accuracy, efficiency, and consistency."
-     - Simulated APR: "Demo uses mocked 5% APR. Real APR varies by market conditions."
-   - Help icon in header: opens modal with FAQ:
-     - "What is no-loss prediction?"
-     - "How do Yield Credits work?"
-     - "Can I lose my principal?"
-     - "What happens if I win/lose?"
-   - Inline hints on empty states and first-time flows
-
-4. **UI/UX Polish**
-   - Responsive design audit:
-     - Test on mobile (375px), tablet (768px), desktop (1280px+)
-     - Ensure all modals, panels, and tables adapt correctly
-   - Accessibility audit:
-     - Run axe-core or Lighthouse accessibility check
-     - Ensure WCAG AA contrast (4.5:1 for text)
-     - Full keyboard navigation (Tab, Enter, Esc)
-     - Focus rings visible and styled
-     - ARIA labels on interactive elements
-   - Motion preferences:
-     - Respect `prefers-reduced-motion` media query
-     - Disable confetti and shimmer animations if set
-   - Loading states:
-     - Skeleton loaders for markets, quests, leaderboard
-     - Spinner for transactions and API calls
-     - Disable buttons during pending states
-   - Error handling:
-     - User-friendly error messages (not raw contract errors)
-     - Retry buttons on failed API calls
-     - Network error banner if offline
-
-5. **Demo Readiness**
-   - Seed realistic demo data:
-     - 10 active markets (varied topics and difficulties)
-     - 5 resolved markets with outcomes
-     - 3 demo users on leaderboard (if needed)
-   - Create demo wallet with testnet weETH:
-     - Document faucet process or provide pre-funded address
-   - Admin panel polish:
-     - Clean UI for creating/resolving markets
-     - Bulk seed data button
-     - APR rate adjustment slider
-   - Performance optimization:
-     - Optimize images (next/image)
-     - Lazy load non-critical components
-     - Minimize API calls (caching, SWR/React Query)
-   - Branding:
-     - EtherFi logo in header and footer
-     - "Powered by EtherFi (weETH)" banner on home and play
-     - Claude logo in quest sections
-     - Consistent visual identity
-
-6. **Testing & QA**
-   - Manual testing checklist:
-     - Complete onboarding flow
-     - Deposit/withdraw cycle
-     - Place bet, resolve, claim
-     - Generate quests, accept, complete
-     - Level up, earn achievement
-     - View leaderboard and profile
-     - Mobile responsiveness
-     - Keyboard navigation
-
-**Deliverable:** Fully polished dApp with analytics, onboarding, comprehensive tooltips, responsive design, and demo-ready state. Ready for presentation.
-
----
-
-### **Post-Launch: Future Enhancements** (Not in MVP)
-
-- Real oracle integration (Chainlink, Pyth, UMA) for market resolution
-- On-chain NFT minting for achievements
-- Social features: comments on markets, user profiles, following
-- Mobile app (React Native or PWA)
-- Multi-chain support (Arbitrum, Optimism, Base)
-- Advanced analytics: heatmaps, correlation analysis
-- Tournament mode: time-boxed competitions with prizes
-- Referral system: invite friends, earn bonus YC
-- Live APR from EtherFi protocol contracts
-- Gasless transactions (meta-transactions or account abstraction)
-
----
-
-## Technology Stack Summary
-
-**Frontend:**
-
-- Next.js 16 (App Router)
-- TypeScript
-- Tailwind CSS
-- Framer Motion
-- Wagmi + Viem
-- RainbowKit or Web3Modal
-- Recharts
-- React Hook Form + Zod
-- Zustand or Context API
-
-**Backend:**
-
-- Next.js API Routes (primary)
-- Python FastAPI/Flask (if needed for complex Claude logic)
-
-**Smart Contracts:**
-
-- Solidity 0.8.x
-- Hardhat or Foundry
-- OpenZeppelin contracts
-- Deployed on Sepolia testnet
-
-**Database:**
-
-- PostgreSQL (Vercel Postgres) or SQLite (local dev)
-- Prisma ORM (optional)
-
-**External APIs:**
-
-- Anthropic Claude API (quest generation, hints, feedback)
-- Alchemy or Infura (RPC provider)
-- Etherscan API (ENS resolution, contract verification)
-
-**Deployment:**
-
-- Vercel (frontend + API routes)
-- Sepolia testnet (smart contracts)
-
----
-
-## Key Risks & Mitigations
-
-**Risk 1: Claude API rate limits or latency**
-
-- Mitigation: Cache responses aggressively (5-15 min), implement retry logic, have fallback static content
-
-**Risk 2: Smart contract bugs in vault**
-
-- Mitigation: Use battle-tested OpenZeppelin patterns, thorough testing, emergency pause function, testnet only for demo
-
-**Risk 3: YC accrual logic complexity**
-
-- Mitigation: Keep it simple (linear APR), clearly document as "demo simulation", use time-based snapshots
-
-**Risk 4: Responsive design issues**
-
-- Mitigation: Mobile-first approach, continuous testing on real devices, use Tailwind responsive utilities consistently
-
-**Risk 5: User confusion about no-loss mechanic**
-
-- Mitigation: Prominent tooltips, onboarding checklist, clear visual separation of Principal vs YC, educational layer throughout
-
-**Risk 6: Leaderboard spam or gaming**
-
-- Mitigation: Minimum participation threshold (10 bets), optional opt-out, rate limiting on bet placement
+## Non-Goals (Out of Scope)
+
+- Complex AMMs or pricing engines
+- Full NFT minting on-chain (designs only)
+- External wallet integrations beyond RainbowKit set
+- Advanced analytics (heatmaps, correlation analysis)
+- Multiple themes/skins
+- Tournament mode
+- Referral system
+- Multi-chain support
+- Mobile app or PWA
+- Social features (comments, following, messaging)
+- Oracle integration (Chainlink, Pyth, UMA)
+- Gasless transactions
 
 ---
 
 ## Success Metrics (Demo Evaluation)
 
-1. **User Flow Completion:**
-   - 90%+ of demo users complete onboarding checklist
-   - 80%+ place at least one YC bet
-   - 70%+ generate and accept a Claude quest
+### User Flow Completion
+- 90%+ complete wallet connection
+- 80%+ place at least one YC bet
+- 70%+ view their profile and achievements
 
-2. **UI/UX Quality:**
-   - Zero WCAG AA violations
-   - <3 second page load times
-   - Zero critical bugs during demo
+### UI/UX Quality
+- Zero WCAG AA violations
+- Sub-3 second page load times
+- Zero critical bugs during demo
+- Smooth animations (no jank)
 
-3. **Feature Completeness:**
-   - All 8 feature specifications (A-H) implemented
-   - All 5 pages (Home, Play, Profile, Leaderboard, Admin) functional
-   - Claude integration working for quests, hints, and feedback
+### Feature Completeness
+- All core features functional (markets, bets, claims, achievements)
+- Claude AI integration working (quests, hints, predictions)
+- Both game modes operational
+- Leaderboards and profile accurate
 
-4. **Polish:**
-   - Consistent design system across all pages
-   - Smooth animations (no jank)
-   - Helpful empty states and error messages
-   - Mobile-responsive on all screens
+### Story Clarity
+- Demo viewers understand "no-loss" mechanic within 30 seconds
+- Principal vs YC distinction immediately clear
+- EtherFi and Claude branding visible
 
-5. **Story Clarity:**
-   - Demo viewers understand "no-loss" mechanic within 30 seconds
-   - Principal vs YC distinction is immediately clear
-   - EtherFi and Claude branding visible and explained
+---
 
-## Implementation Status
+## Phase Implementation Summary
 
-- [x] Phase 0: Project Bootstrap & Foundation
-- [x] Phase 1: Wallet Integration & Basic UI Shell
-- [x] Phase 2: Smart Contracts & Vault Integration
-- [x] Phase 3: Markets & Prediction Gameplay
-- [x] Phase 4: Claude Quests & Adaptive Gameplay
-- [x] Phase 5: Player Progression & Social Features
-- [ ] Phase 6: Portfolio Analytics & Final Polish
-- [ ] Post-Launch: Future Enhancements (Not in MVP)
+- [x] **Phase 0**: Project Bootstrap & Foundation - COMPLETE
+- [x] **Phase 1**: Wallet Integration & Basic UI Shell - COMPLETE
+- [x] **Phase 2**: Smart Contracts & Vault Integration - ~90% (contracts written, not deployed)
+- [x] **Phase 3**: Markets & Prediction Gameplay - COMPLETE
+- [x] **Phase 4**: Game Modes & Automated Claude Trading - COMPLETE
+- [x] **Phase 5**: Player Progression & Social Features - ~85% (class assignment missing)
+- [ ] **Phase 6**: Portfolio Analytics & Final Polish - ~50% (analytics partial, onboarding missing)
+- [ ] **Post-Launch**: Future Enhancements - NOT STARTED
+
+---
+
+## Maintenance Notes
+
+**Last Updated**: 2025-11-09
+
+**Current State**: Demo-ready, not production-ready
+
+**Blockers for Production**:
+1. Smart contracts not deployed (addresses are 0x0)
+2. Database is SQLite (not production-grade)
+3. Admin auth is insecure (simple address check)
+4. No automated tests
+5. No monitoring or logging
+6. Using MockWeETH instead of real weETH
+
+**Demo Strengths**:
+- Polished UI/UX with excellent accessibility
+- Comprehensive Claude AI integration
+- Full game loop functional (manual and automated modes)
+- Rich player progression system
+- Realistic demo data generation
+
+**When updating this file**:
+- Update "Last Updated" date
+- Document new constraints or requirements
+- Update implementation status percentages
+- Add new TODOs to Known Issues section
+- Do NOT add progress logs or test reports
