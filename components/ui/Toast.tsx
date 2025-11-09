@@ -1,12 +1,19 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToastStore } from "@/lib/stores/toast";
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from "lucide-react";
 
 export function ToastContainer() {
   const { toasts, removeToast } = useToastStore();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   const icons = {
     success: <CheckCircle className="h-5 w-5" />,
@@ -29,8 +36,10 @@ export function ToastContainer() {
     info: "bg-primary/20 border-primary/40",
   };
 
-  return (
-    <div className="pointer-events-none fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-md">
+  if (!mounted) return null;
+
+  const toastContent = (
+    <div className="pointer-events-none fixed bottom-6 right-6 z-[99999] flex flex-col gap-3 max-w-md">
       <AnimatePresence>
         {toasts.map((toast) => (
           <motion.div
@@ -60,4 +69,6 @@ export function ToastContainer() {
       </AnimatePresence>
     </div>
   );
+
+  return createPortal(toastContent, document.body);
 }

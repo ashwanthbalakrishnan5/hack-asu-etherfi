@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Market, ClaudeProbabilityHint } from '@/lib/types';
 import { X, TrendingUp, TrendingDown, Sparkles, Loader2, Trophy } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -30,6 +31,12 @@ export function BetTicket({
   const [error, setError] = useState<string | null>(null);
   const [hint, setHint] = useState<ClaudeProbabilityHint | null>(null);
   const [loadingHint, setLoadingHint] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   // Reset state when market changes
   useEffect(() => {
@@ -143,9 +150,9 @@ export function BetTicket({
   const expectedPayout = calculateExpectedPayout();
   const potentialProfit = expectedPayout - (parseFloat(amount) || 0);
 
-  if (!market) return null;
+  if (!market || !mounted) return null;
 
-  return (
+  const panelContent = (
     <AnimatePresence>
       {isOpen && (
         <>
@@ -155,7 +162,7 @@ export function BetTicket({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998]"
           />
 
           {/* Panel */}
@@ -164,7 +171,7 @@ export function BetTicket({
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed right-0 top-0 h-full w-full max-w-md bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 shadow-2xl z-50 overflow-y-auto border-l-2 border-cyan-500/30"
+            className="fixed right-0 top-0 h-full w-full max-w-md bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 shadow-2xl z-[9999] overflow-y-auto border-l-2 border-cyan-500/30"
           >
             {/* Animated Background Pattern */}
             <div className="absolute inset-0 opacity-5">
@@ -496,4 +503,6 @@ export function BetTicket({
       )}
     </AnimatePresence>
   );
+
+  return createPortal(panelContent, document.body);
 }

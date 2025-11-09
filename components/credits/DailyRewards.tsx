@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Card, Button } from '@/components/ui';
 import { X, Calendar, Flame, Gift, Star, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -24,6 +25,7 @@ export function DailyRewards({ isOpen, onClose }: DailyRewardsProps) {
   const [currentStreak, setCurrentStreak] = useState(0);
   const [canClaim, setCanClaim] = useState(true);
   const [isClaiming, setIsClaiming] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [rewards, setRewards] = useState<DailyReward[]>([
     { day: 1, credits: 50, claimed: false },
     { day: 2, credits: 75, claimed: false },
@@ -33,6 +35,11 @@ export function DailyRewards({ isOpen, onClose }: DailyRewardsProps) {
     { day: 6, credits: 300, claimed: false },
     { day: 7, credits: 500, claimed: false, bonus: '🎁 JACKPOT' },
   ]);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   useEffect(() => {
     if (address && isOpen) {
@@ -98,7 +105,9 @@ export function DailyRewards({ isOpen, onClose }: DailyRewardsProps) {
   const nextReward = rewards[currentStreak];
   const completedAll = currentStreak >= 7;
 
-  return (
+  if (!mounted) return null;
+
+  const modalContent = (
     <AnimatePresence>
       {isOpen && (
         <>
@@ -112,14 +121,14 @@ export function DailyRewards({ isOpen, onClose }: DailyRewardsProps) {
           />
 
           {/* Modal Container */}
-          <div className="fixed inset-0 z-[9999] overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="w-full max-w-lg my-8"
-              >
+          <div className="fixed inset-0 z-[9999] overflow-y-auto flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="w-full max-w-lg"
+              onClick={(e) => e.stopPropagation()}
+            >
                 <Card className="bg-gradient-to-br from-purple-900/30 to-blue-900/30 border-purple-400/30">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
@@ -255,11 +264,12 @@ export function DailyRewards({ isOpen, onClose }: DailyRewardsProps) {
                   Login daily to build your streak and earn more credits!
                 </div>
               </Card>
-              </motion.div>
-            </div>
+            </motion.div>
           </div>
         </>
       )}
     </AnimatePresence>
   );
+
+  return createPortal(modalContent, document.body);
 }

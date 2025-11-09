@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Card, Button } from '@/components/ui';
 import { X, Zap, Gift, Star, Sparkles, TrendingUp, Crown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -33,6 +34,12 @@ export function CreditsStore({ isOpen, onClose, currentBalance }: CreditsStorePr
   const { address } = useAccount();
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
   const [isPurchasing, setIsPurchasing] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   const handlePurchase = async (pkg: CreditPackage) => {
     if (!address) {
@@ -72,7 +79,9 @@ export function CreditsStore({ isOpen, onClose, currentBalance }: CreditsStorePr
     }
   };
 
-  return (
+  if (!mounted) return null;
+
+  const modalContent = (
     <AnimatePresence>
       {isOpen && (
         <>
@@ -86,15 +95,15 @@ export function CreditsStore({ isOpen, onClose, currentBalance }: CreditsStorePr
           />
 
           {/* Modal Container */}
-          <div className="fixed inset-0 z-[9999] overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="w-full max-w-2xl my-8"
-              >
-                <Card className="bg-gradient-to-br from-gray-900 to-gray-800 border-primary/30">
+          <div className="fixed inset-0 z-[9999] overflow-y-auto flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="w-full max-w-4xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Card className="bg-gradient-to-br from-gray-900 to-gray-800 border-primary/30">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-3">
@@ -117,61 +126,61 @@ export function CreditsStore({ isOpen, onClose, currentBalance }: CreditsStorePr
                 </div>
 
                 {/* Packages */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                   {CREDIT_PACKAGES.map((pkg) => (
                     <motion.div
                       key={pkg.id}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className={`relative p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                      className={`relative p-3 rounded-xl border-2 transition-all cursor-pointer ${
                         pkg.popular
                           ? 'border-primary bg-gradient-to-br from-primary/10 to-primary/5'
                           : 'border-gray-700 bg-gray-800/50 hover:border-gray-600'
                       }`}
                     >
                       {pkg.badge && (
-                        <div className="absolute -top-3 -right-3 px-3 py-1 rounded-full bg-gradient-to-r from-orange-500 to-red-500 text-xs font-bold text-white shadow-lg">
+                        <div className="absolute -top-2 -right-2 px-2 py-0.5 rounded-full bg-gradient-to-r from-orange-500 to-red-500 text-[10px] font-bold text-white shadow-lg whitespace-nowrap">
                           {pkg.badge}
                         </div>
                       )}
 
-                      <div className="space-y-3">
-                        <div className="flex items-baseline gap-2">
-                          <div className="text-3xl font-bold text-primary">
+                      <div className="space-y-2">
+                        <div className="flex items-baseline gap-1 flex-wrap">
+                          <div className="text-2xl font-bold text-primary">
                             {pkg.amount.toLocaleString()}
                           </div>
-                          <div className="text-sm text-foreground/60">Credits</div>
+                          <div className="text-xs text-foreground/60">Credits</div>
                         </div>
 
                         {pkg.bonus > 0 && (
-                          <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-green-400/10 border border-green-400/20 w-fit">
-                            <Gift className="w-4 h-4 text-green-400" />
-                            <span className="text-sm font-semibold text-green-400">
+                          <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-green-400/10 border border-green-400/20 w-fit">
+                            <Gift className="w-3 h-3 text-green-400 flex-shrink-0" />
+                            <span className="text-xs font-semibold text-green-400 whitespace-nowrap">
                               +{pkg.bonus} Bonus
                             </span>
                           </div>
                         )}
 
-                        <div className="flex items-center justify-between pt-2">
-                          <div className="text-2xl font-bold text-foreground">
-                            ${pkg.price}
-                          </div>
-                          <Button
-                            onClick={() => handlePurchase(pkg)}
-                            disabled={isPurchasing && selectedPackage === pkg.id}
-                            variant={pkg.popular ? 'primary' : 'secondary'}
-                            size="sm"
-                          >
-                            {isPurchasing && selectedPackage === pkg.id ? (
-                              'Processing...'
-                            ) : (
-                              'Buy Now'
-                            )}
-                          </Button>
+                        <div className="text-xl font-bold text-foreground">
+                          ${pkg.price}
                         </div>
 
+                        <Button
+                          onClick={() => handlePurchase(pkg)}
+                          disabled={isPurchasing && selectedPackage === pkg.id}
+                          variant={pkg.popular ? 'primary' : 'secondary'}
+                          size="sm"
+                          className="w-full"
+                        >
+                          {isPurchasing && selectedPackage === pkg.id ? (
+                            'Processing...'
+                          ) : (
+                            'Buy Now'
+                          )}
+                        </Button>
+
                         {pkg.bonus > 0 && (
-                          <div className="text-xs text-foreground/50 pt-1">
+                          <div className="text-[10px] text-foreground/50 text-center">
                             Total: {(pkg.amount + pkg.bonus).toLocaleString()} YC
                           </div>
                         )}
@@ -179,28 +188,13 @@ export function CreditsStore({ isOpen, onClose, currentBalance }: CreditsStorePr
                     </motion.div>
                   ))}
                 </div>
-
-                {/* Free Credits Info */}
-                <div className="p-4 rounded-lg bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-400/20">
-                  <div className="flex items-start gap-3">
-                    <Sparkles className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
-                    <div className="space-y-2">
-                      <div className="font-semibold text-foreground">Earn Free Credits</div>
-                      <div className="text-sm text-foreground/70 space-y-1">
-                        <div>• Daily Login: Up to 500 YC/day</div>
-                        <div>• Top 10 Leaderboard: 1000 YC weekly</div>
-                        <div>• 5-Win Streak: 200 YC bonus</div>
-                        <div>• Deposit weETH: Earn 5% APR yield</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </Card>
-              </motion.div>
-            </div>
+            </motion.div>
           </div>
         </>
       )}
     </AnimatePresence>
   );
+
+  return createPortal(modalContent, document.body);
 }

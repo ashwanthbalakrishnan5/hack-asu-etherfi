@@ -100,18 +100,17 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
               placeholder="0.0"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="pr-16"
+              className="pr-20"
               step="0.01"
               min="0"
             />
-            <Button
-              variant="subtle"
-              size="sm"
+            <button
+              type="button"
               onClick={handleMaxClick}
-              className="absolute right-2 top-1/2 -translate-y-1/2"
+              className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 text-xs font-semibold text-primary hover:text-primary-bright bg-primary/10 hover:bg-primary/20 rounded-md transition-colors"
             >
               MAX
-            </Button>
+            </button>
           </div>
         </div>
 

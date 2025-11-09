@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "./Button";
@@ -14,6 +15,12 @@ interface ModalProps {
 
 export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   // Handle ESC key
   useEffect(() => {
@@ -34,7 +41,9 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
     };
   }, [isOpen, onClose]);
 
-  return (
+  if (!mounted) return null;
+
+  const modalContent = (
     <AnimatePresence>
       {isOpen && (
         <>
@@ -49,41 +58,42 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
           />
 
           {/* Modal Container */}
-          <div className="fixed inset-0 z-[9999] overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4">
-              <motion.div
-                ref={modalRef}
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                transition={{ duration: 0.3, type: "spring", damping: 25, stiffness: 300 }}
-                className="relative w-full max-w-lg my-8 rounded-2xl border-2 border-surface-elevated/50 bg-gradient-to-br from-surface via-surface-elevated to-surface p-6 shadow-2xl shadow-primary/10 backdrop-blur-xl"
-              >
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+          <div className="fixed inset-0 z-[9999] overflow-y-auto flex items-center justify-center p-4">
+            <motion.div
+              ref={modalRef}
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.3, type: "spring", damping: 25, stiffness: 300 }}
+              className="relative w-full max-w-lg rounded-2xl border-2 border-surface-elevated/50 bg-gradient-to-br from-surface via-surface-elevated to-surface p-6 shadow-2xl shadow-primary/10 backdrop-blur-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Gradient overlay */}
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
 
-            {/* Header */}
-            <div className="relative z-10 mb-6 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-foreground bg-gradient-to-r from-foreground to-foreground-muted bg-clip-text">
-                {title}
-              </h2>
-              <Button
-                variant="subtle"
-                size="sm"
-                onClick={onClose}
-                className="h-9 w-9 p-0 rounded-lg"
-              >
-                <X size={18} />
-              </Button>
-            </div>
+              {/* Header */}
+              <div className="relative z-10 mb-6 flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-foreground bg-gradient-to-r from-foreground to-foreground-muted bg-clip-text">
+                  {title}
+                </h2>
+                <Button
+                  variant="subtle"
+                  size="sm"
+                  onClick={onClose}
+                  className="h-9 w-9 p-0 rounded-lg"
+                >
+                  <X size={18} />
+                </Button>
+              </div>
 
-            {/* Content */}
-            <div className="relative z-10">{children}</div>
-              </motion.div>
-            </div>
+              {/* Content */}
+              <div className="relative z-10">{children}</div>
+            </motion.div>
           </div>
         </>
       )}
     </AnimatePresence>
   );
+
+  return createPortal(modalContent, document.body);
 }
