@@ -36,6 +36,7 @@ Traditional prediction markets require you to risk your own capital. **Yield Que
 ### Prediction Markets
 
 Engage with diverse binary prediction markets covering:
+
 - Cryptocurrency prices and trends
 - Sports outcomes
 - Technology developments
@@ -43,6 +44,7 @@ Engage with diverse binary prediction markets covering:
 - Science and research breakthroughs
 
 Each market features:
+
 - Clear YES/NO questions
 - Difficulty ratings (1-5 stars)
 - Close times for resolution
@@ -54,18 +56,21 @@ Each market features:
 What sets Yield Quest apart is the integration of **Claude AI (Haiku 4.5)** as an adaptive, intelligent game master:
 
 #### Personalized Quests
+
 - Claude generates custom quests tailored to your skill level
 - Adaptive difficulty based on your historical accuracy
 - Educational learning outcomes embedded in each quest
 - Complete quests to earn bonus XP and achievements
 
 #### Probability Hints
+
 - Get AI-powered probability assessments for any market
 - Receive detailed reasoning and educational tips
 - Improve your prediction skills through Claude's insights
 - Learn to think critically about market outcomes
 
 #### Automated Trading Mode
+
 - Enable Claude to research and bet on your behalf
 - Set risk levels (Low/Medium/High) and confidence thresholds
 - Claude analyzes markets, calculates probabilities, and places bets automatically
@@ -77,6 +82,7 @@ What sets Yield Quest apart is the integration of **Claude AI (Haiku 4.5)** as a
 ## Key Features
 
 ### 1. Wallet Integration
+
 - **Multi-Wallet Support**: Connect via MetaMask, WalletConnect, Coinbase Wallet, and more
 - **Powered by RainbowKit**: Seamless, beautiful wallet connection experience
 - **Network Validation**: Hardcoded to Sepolia testnet for demo
@@ -85,6 +91,7 @@ What sets Yield Quest apart is the integration of **Claude AI (Haiku 4.5)** as a
 ### 2. Two Game Modes
 
 #### Manual Mode
+
 - Browse available prediction markets
 - Analyze odds and market dynamics
 - Place bets manually with your YC balance
@@ -92,6 +99,7 @@ What sets Yield Quest apart is the integration of **Claude AI (Haiku 4.5)** as a
 - Claim winnings after market resolution
 
 #### Automated Mode
+
 - Toggle automated predictions on/off
 - Configure risk parameters (Low/Medium/High)
 - Set maximum bet per market and minimum confidence threshold
@@ -101,11 +109,13 @@ What sets Yield Quest apart is the integration of **Claude AI (Haiku 4.5)** as a
 ### 3. Player Progression System
 
 #### Experience & Leveling
+
 - **XP Rewards**: +10 for placing bets, +20 for wins, +50 for 3-win streaks, +30 for quest completion
 - **Level Calculation**: `level = sqrt(xp / 100)` with quadratic progression
 - **Visual Progress**: Real-time XP meter and level badges
 
 #### Skill Metrics
+
 - **Accuracy**: Win rate percentage (wins / total bets × 100)
 - **Yield Efficiency**: Return on YC spent ((YC won - YC spent) / YC spent × 100)
 - **Wisdom Index**: Composite score combining accuracy (50%), yield efficiency (30%), and streak bonus (20%)
@@ -115,21 +125,22 @@ What sets Yield Quest apart is the integration of **Claude AI (Haiku 4.5)** as a
 
 Earn 7 unique achievements with varying rarity tiers:
 
-| Achievement | Requirement | Rarity |
-|------------|-------------|---------|
-| First Blood | Place your first bet | Common |
-| Hat Trick | Win 3 in a row | Rare |
-| Sharpshooter | >60% accuracy with 10+ bets | Epic |
-| Quest Master | Complete 5 Claude quests | Rare |
-| Diamond Hands | Withdraw after 7 days staking | Uncommon |
-| Whale | Deposit >1 weETH | Rare |
-| Oracle | >75% accuracy with 20+ bets | Legendary |
+| Achievement   | Requirement                   | Rarity    |
+| ------------- | ----------------------------- | --------- |
+| First Blood   | Place your first bet          | Common    |
+| Hat Trick     | Win 3 in a row                | Rare      |
+| Sharpshooter  | >60% accuracy with 10+ bets   | Epic      |
+| Quest Master  | Complete 5 Claude quests      | Rare      |
+| Diamond Hands | Withdraw after 7 days staking | Uncommon  |
+| Whale         | Deposit >1 weETH              | Rare      |
+| Oracle        | >75% accuracy with 20+ bets   | Legendary |
 
 Each earned achievement triggers a celebration with confetti animation and is permanently displayed on your profile.
 
 ### 5. Social & Competitive Features
 
 #### Global Leaderboards
+
 - **Accuracy Leaders**: Top players by prediction accuracy
 - **Wisdom Index Leaders**: Best overall performers
 - **Quest Masters**: Most quests completed
@@ -138,6 +149,7 @@ Each earned achievement triggers a celebration with confetti animation and is pe
 - **Real-time Rankings**: Pagination with 20 players per page
 
 #### Profile Page
+
 - Comprehensive stats dashboard
 - Level, XP, and progress visualization
 - Total bets, wins, losses
@@ -149,6 +161,7 @@ Each earned achievement triggers a celebration with confetti animation and is pe
 ### 6. Vault & Credit System
 
 #### Vault Mechanics
+
 - Deposit weETH to start earning YC
 - View real-time principal balance
 - Withdraw principal anytime (no lockup periods)
@@ -156,6 +169,7 @@ Each earned achievement triggers a celebration with confetti animation and is pe
 - Smart contract protection
 
 #### Yield Credits (YC)
+
 - Accrue from staked principal (5% simulated APR)
 - Visual "breathing" effect shows active accrual
 - Cannot be transferred (only spent or won)
@@ -165,6 +179,7 @@ Each earned achievement triggers a celebration with confetti animation and is pe
 ### 7. Demo Mode
 
 For easy onboarding and testing:
+
 - Auto-generates 8 diverse prediction markets
 - Seeds realistic user stats
 - Awards 2-3 common achievements
@@ -175,6 +190,7 @@ For easy onboarding and testing:
 ### 8. Admin Panel
 
 Manage the platform (address-gated):
+
 - Create new prediction markets
 - Resolve markets (YES/NO/CANCEL outcomes)
 - Auto-resolve expired markets
@@ -187,38 +203,38 @@ Manage the platform (address-gated):
 
 ### Frontend Stack
 
-| Technology | Version | Purpose |
-|-----------|---------|---------|
-| Next.js | 16.0.1 | App Router framework |
-| TypeScript | 5.x | Type safety |
-| React | 19.2.0 | UI library |
-| Tailwind CSS | 4.x | Styling & design system |
-| Framer Motion | 12.x | Animations |
-| Wagmi | 2.19.2 | Web3 React hooks |
-| Viem | 2.38.6 | Ethereum library |
-| RainbowKit | 2.2.9 | Wallet connection |
-| Zustand | 5.0.8 | State management |
-| React Hook Form | 7.66.0 | Form handling |
-| Zod | 4.1.12 | Schema validation |
-| Recharts | 3.3.0 | Analytics charts |
-| Lucide React | 0.553 | Icon library |
+| Technology      | Version | Purpose                 |
+| --------------- | ------- | ----------------------- |
+| Next.js         | 16.0.1  | App Router framework    |
+| TypeScript      | 5.x     | Type safety             |
+| React           | 19.2.0  | UI library              |
+| Tailwind CSS    | 4.x     | Styling & design system |
+| Framer Motion   | 12.x    | Animations              |
+| Wagmi           | 2.19.2  | Web3 React hooks        |
+| Viem            | 2.38.6  | Ethereum library        |
+| RainbowKit      | 2.2.9   | Wallet connection       |
+| Zustand         | 5.0.8   | State management        |
+| React Hook Form | 7.66.0  | Form handling           |
+| Zod             | 4.1.12  | Schema validation       |
+| Recharts        | 3.3.0   | Analytics charts        |
+| Lucide React    | 0.553   | Icon library            |
 
 ### Backend Stack
 
-| Technology | Version | Purpose |
-|-----------|---------|---------|
-| Next.js API Routes | 16.0.1 | 28 REST endpoints |
-| Prisma | 6.19.0 | ORM |
-| SQLite | - | Database (dev) |
-| Anthropic SDK | 0.68.0 | Claude AI integration |
-| Claude Haiku 4.5 | 20251001 | AI model |
+| Technology         | Version  | Purpose               |
+| ------------------ | -------- | --------------------- |
+| Next.js API Routes | 16.0.1   | 28 REST endpoints     |
+| Prisma             | 6.19.0   | ORM                   |
+| SQLite             | -        | Database (dev)        |
+| Anthropic SDK      | 0.68.0   | Claude AI integration |
+| Claude Haiku 4.5   | 20251001 | AI model              |
 
 ### Smart Contracts
 
-| Contract | Language | Lines | Status |
-|----------|----------|-------|--------|
-| GameVault.sol | Solidity 0.8.20 | ~120 | Written, not deployed |
-| MockWeETH.sol | Solidity 0.8.20 | ~45 | Written, not deployed |
+| Contract      | Language        | Lines | Status                |
+| ------------- | --------------- | ----- | --------------------- |
+| GameVault.sol | Solidity 0.8.20 | ~120  | Written, not deployed |
+| MockWeETH.sol | Solidity 0.8.20 | ~45   | Written, not deployed |
 
 **Libraries**: OpenZeppelin Contracts 5.4.0
 
@@ -253,6 +269,7 @@ Manage the platform (address-gated):
 ### Design System
 
 **Color Palette (Dark Theme)**:
+
 - Background: `#0a0f1a` (near-black)
 - Surface: `#131b2e` (dark navy)
 - Primary: `#00d4ff` (cyan/teal - EtherFi brand)
@@ -262,6 +279,7 @@ Manage the platform (address-gated):
 - Error: `#ef4444` (red)
 
 **Accessibility**:
+
 - WCAG AA compliant (4.5:1 contrast minimum)
 - Full keyboard navigation
 - Visible focus states
@@ -269,6 +287,7 @@ Manage the platform (address-gated):
 - Respects `prefers-reduced-motion`
 
 **Responsive Design**:
+
 - Mobile-first approach
 - Breakpoints: sm (640px), md (768px), lg (1024px), xl (1280px)
 - Optimized for phones, tablets, and desktops
@@ -336,8 +355,6 @@ Manage the platform (address-gated):
 ├── tailwind.config.js            # Tailwind config
 ├── hardhat.config.js             # Hardhat config
 ├── CLAUDE.md                     # Full project documentation
-├── SETUP.md                      # Setup instructions
-├── TESTING.md                    # Testing guide
 └── README.md                     # This file
 ```
 
@@ -355,22 +372,26 @@ Manage the platform (address-gated):
 ### Installation Steps
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/ashwanthbalakrishnan5/hack-asu-etherfi.git
    cd hack-asu-etherfi
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment variables**
+
    ```bash
    cp .env.example .env.local
    ```
 
    Edit `.env.local` and fill in required values:
+
    ```env
    # Database
    DATABASE_URL="file:./dev.db"
@@ -397,12 +418,14 @@ Manage the platform (address-gated):
    ```
 
 4. **Initialize database**
+
    ```bash
    npx prisma generate
    npx prisma db push
    ```
 
 5. **Run development server**
+
    ```bash
    npm run dev
    ```
@@ -463,6 +486,7 @@ npm run verify-demo  # Verify demo data
 ### Earning Achievements
 
 Achievements unlock automatically when you meet their requirements:
+
 - Play your first game to earn "First Blood"
 - Win 3 in a row for "Hat Trick"
 - Maintain high accuracy for "Sharpshooter" and "Oracle"
@@ -555,6 +579,7 @@ Achievements unlock automatically when you meet their requirements:
 ## Security Considerations
 
 **For Demo/Hackathon Use:**
+
 - This is a demonstration application, not production-ready
 - Smart contracts are unaudited
 - Database is local and ephemeral (SQLite)
@@ -562,6 +587,7 @@ Achievements unlock automatically when you meet their requirements:
 - No rate limiting on API endpoints
 
 **Before Production:**
+
 - Full smart contract audit required
 - Implement signature verification for all admin actions
 - Add rate limiting and DDoS protection
@@ -632,4 +658,4 @@ Let's make DeFi safer, smarter, and more accessible together.
 
 ---
 
-*Built with ❤️ for Hack ASU 2025*
+_Built with ❤️ for Hack ASU 2025_
