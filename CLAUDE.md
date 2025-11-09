@@ -998,120 +998,34 @@ This plan breaks down the entire project into 6 logical phases, each building up
 
 ## Implementation Notes for future developers
 
-### Phase 2 Completion Notes (Smart Contracts & Vault Integration)
+### Phase 2 & 3 - Key Implementation Details
 
-**What was implemented:**
-1. GameVault.sol smart contract deployed with deposit/withdraw functionality
-2. MockWeETH.sol token contract for testing (includes faucet function)
-3. Hardhat 2.x development environment with OpenZeppelin 5.x contracts
-4. Prisma ORM with SQLite database for user data and YC balances
-5. API routes for YC management:
-   - GET /api/yc/balance - Fetch user YC balance
-   - POST /api/yc/accrue - Calculate and update YC accrual
-   - POST /api/yc/update-principal - Update user principal balance
-6. React hooks for vault and YC management (useVault, useYieldCredits)
-7. Vault UI components: VaultCard, DepositModal, WithdrawModal, YCMeter
-8. YC accrual logic with simulated 5% APR
+**Database Schema (Prisma/SQLite):**
 
-**Technical decisions:**
-- Used Hardhat 2.x instead of 3.x due to ESM compatibility issues with Next.js
-- OpenZeppelin 5.x contracts require passing owner address to Ownable constructor
-- YC balances are managed off-chain in database (no on-chain YC token)
-- SQLite database for demo purposes (production should use PostgreSQL)
-- Simulated APR of 5% for demo (real APR would come from EtherFi protocol)
+- `users`: address, ycBalance, principal, lastAccrualTime, xp, level, wins, losses, accuracy
+- `markets`: id, question, closeTime, difficulty, yesPool, noPool, resolved, outcome
+- `positions`: id, userId, marketId, side, amount, claimed
+- `quests`: id, userId, marketId, difficulty, accepted, completed (ready for Phase 4)
 
-**Contract addresses (local Hardhat):**
-- MockWeETH: 0x5FbDB2315678afecb367f032d93F642f64180aa3
-- GameVault: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+**Existing API Routes:**
 
-**Next steps for deployment:**
-1. Deploy contracts to Sepolia testnet using `npx hardhat run scripts/deploy.js --network sepolia`
-2. Update .env.local with deployed contract addresses
-3. Get Sepolia ETH from faucet and weETH from MockWeETH faucet function
-4. Test full deposit/withdraw flow on Sepolia
+- YC: GET /api/yc/balance, POST /api/yc/accrue, POST /api/yc/update-principal
+- Markets: GET/POST /api/markets, PATCH /api/markets/:id/resolve, POST/DELETE /api/markets/seed
+- Positions: GET/POST /api/positions, POST /api/positions/:id/claim
+- Claude: POST /api/claude/probability-hint (returns {probability, rationale, tip})
 
-**Known limitations:**
-- Gas estimation is placeholder (shows static value)
-- No real oracle integration for APR (using simulated 5%)
-- Database is local SQLite (needs PostgreSQL for production)
-- No transaction error handling for network failures
+**Key Technical Notes:**
 
-### Phase 3 Completion Notes (Markets & Prediction Gameplay)
+- @anthropic-ai/sdk installed and working
+- Next.js 15+ requires async params in dynamic routes
+- Toast store: use toast.success/error (not useToast hook)
+- XP system: +10 bet, +20 win, +50 streak
+- User stats (wins, losses, accuracy) tracked in users table
 
-**What was implemented:**
-1. Complete market management system:
-   - GET /api/markets - List markets with filtering (active/resolved)
-   - POST /api/markets - Create new markets (admin only)
-   - PATCH /api/markets/:id/resolve - Resolve markets with outcomes
-   - POST /api/markets/seed - Seed 10 demo markets
-   - DELETE /api/markets/seed - Clear all markets for testing
+**Phase 4 Requirements:**
 
-2. Positions/betting system:
-   - POST /api/positions - Place YC bets on markets
-   - GET /api/positions - Fetch user positions
-   - POST /api/positions/:id/claim - Claim winnings from resolved markets
-   - Automatic YC balance updates and XP rewards
-
-3. Claude AI integration for probability hints:
-   - POST /api/claude/probability-hint - Generate probability estimates
-   - Returns JSON with probability (0-1), rationale, and educational tip
-   - 5-minute caching for performance
-   - Graceful fallback if API key not configured
-
-4. UI components:
-   - MarketCard - Display market details, pools, odds, and status
-   - MarketsList - List markets with tabs for active/resolved
-   - BetTicket - Slide-in panel for placing bets with Claude hints
-   - PositionsList - Show user positions with claim functionality
-
-5. Admin panel (/admin):
-   - Create new markets with question, difficulty, and close time
-   - Resolve markets with YES/NO/CANCEL outcomes
-   - View all markets and their status
-
-6. Play page integration:
-   - Full markets display with betting functionality
-   - User positions list with claim buttons
-   - Real-time YC balance updates
-   - BetTicket opens on "Place Bet" click
-
-**Technical decisions:**
-- Next.js 15+ requires `params` to be async in dynamic routes
-- Used date-fns for date formatting and relative times
-- Installed @anthropic-ai/sdk for Claude integration
-- Fixed toast store usage (toast.success/error instead of useToast hook)
-- Markets use simple payout formula: amount * (totalPool / sidePool)
-- XP system: +10 for placing bet, +20 for winning, +50 for 3-win streak
-
-**Component architecture:**
-- MarketCard shows difficulty (1-5 stars), pools, odds, and close time
-- BetTicket fetches Claude hints on open, calculates expected payout
-- PositionsList shows status badges (Pending, Won, Lost, Claimable)
-- All components use Framer Motion for smooth animations
-
-**API features:**
-- Market filtering by status (active/resolved)
-- Position validation (YC balance, market status, amount)
-- Automatic stats tracking (wins, losses, accuracy)
-- XP and level calculations on bet placement and claim
-- Claim validation (market resolved, not already claimed, correct outcome)
-
-**Demo data:**
-- 10 seed markets covering crypto, tech, finance, and economy
-- Varied difficulty levels (1-5)
-- Close times ranging from 15-60 days
-- Topics include Bitcoin, Ethereum, AI, Tesla, Fed rates, etc.
-
-**Known limitations:**
-- Claude hints are optional and gracefully fail if API not configured
-- No real oracle integration for market resolution (admin manual)
-- Payout calculations are simple (no AMM or complex pricing)
-- No gas estimates for on-chain transactions
-- Positions are tracked off-chain in database only
-
-**Next steps for Phase 4:**
-- Implement quest generation system
-- Create QuestCard and QuestsPanel components
-- Add quest acceptance and completion tracking
-- Build post-resolution feedback from Claude
-- Integrate quests into Play page
+- Create quest generation API using Claude (return 3 quests as JSON)
+- Build QuestCard and QuestsPanel UI components
+- Add quest acceptance flow (links to markets, pre-fills bet)
+- Implement post-resolution feedback from Claude
+- Track quest completion in database
