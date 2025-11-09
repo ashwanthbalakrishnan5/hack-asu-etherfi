@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import {
+  checkAndAwardAchievements,
+  calculateYieldEfficiency,
+  calculateWisdomIndex,
+} from '@/lib/achievements';
 
 const prisma = new PrismaClient();
 
@@ -130,6 +135,21 @@ export async function POST(
       const losses = won ? user.losses : user.losses + 1;
       const accuracy = totalBets > 0 ? (wins / totalBets) * 100 : 0;
 
+      // Update streak count
+      let streakCount = user.streakCount;
+      if (won) {
+        streakCount += 1;
+      } else if (market.outcome !== 'CANCEL') {
+        streakCount = 0; // Reset streak on loss
+      }
+
+      // Update ycWon
+      const ycWon = user.ycWon + payout;
+
+      // Calculate metrics
+      const yieldEfficiency = calculateYieldEfficiency(ycWon, user.ycSpent);
+      const wisdomIndex = calculateWisdomIndex(accuracy, yieldEfficiency, streakCount);
+
       const updatedUser = await tx.user.update({
         where: { id: user.id },
         data: {
@@ -138,10 +158,20 @@ export async function POST(
           losses: !won && market.outcome !== 'CANCEL' ? { increment: 1 } : undefined,
           accuracy,
           xp: { increment: xpEarned },
+          streakCount,
+          ycWon,
+          yieldEfficiency,
+          wisdomIndex,
         },
       });
 
       return { position: updatedPosition, user: updatedUser };
+    });
+
+    // Check achievements
+    const newAchievements = await checkAndAwardAchievements({
+      userId: user.id,
+      userAddress,
     });
 
     return NextResponse.json({
@@ -151,6 +181,8 @@ export async function POST(
       newYCBalance: result.user.ycBalance,
       xpEarned,
       outcome: market.outcome,
+      newAchievements,
+      streakCount: result.user.streakCount,
     });
   } catch (error) {
     console.error('Error claiming position:', error);

@@ -992,7 +992,7 @@ This plan breaks down the entire project into 6 logical phases, each building up
 - [x] Phase 2: Smart Contracts & Vault Integration
 - [x] Phase 3: Markets & Prediction Gameplay
 - [x] Phase 4: Claude Quests & Adaptive Gameplay
-- [ ] Phase 5: Player Progression & Social Features
+- [x] Phase 5: Player Progression & Social Features
 - [ ] Phase 6: Portfolio Analytics & Final Polish
 - [ ] Post-Launch: Future Enhancements (Not in MVP)
 
@@ -1036,12 +1036,40 @@ This plan breaks down the entire project into 6 logical phases, each building up
 - Adaptive difficulty: >70% accuracy = harder quests (4-5), <50% = easier (1-3)
 - Quest schema: includes marketId, feedback, suggestion fields
 
-**Phase 5 Requirements:**
+**Phase 5 - Player Progression & Social Features Implementation:**
 
-- Implement XP and leveling system (level = floor(sqrt(xp / 100)))
-- Create achievement system with 7 core achievements (First Bet, Hat Trick, Sharpshooter, etc.)
-- Build achievement badges with NFT-ready designs
-- Add accuracy, yield efficiency, and wisdom index calculations
-- Create leaderboard with three tabs (Accuracy, Wisdom Index, Quest Masters)
-- Build profile page with stats, achievements grid, and history timeline
-- Implement class badges (Oracle, Degen, Analyst, Whale)
+**Database Schema Updates:**
+- Added to User model: streakCount, ycSpent, ycWon, yieldEfficiency, wisdomIndex, showOnLeaderboard, displayName, firstDepositAt, firstWithdrawAt, completedQuests
+- Achievement model: userId, type, earnedAt
+
+**API Routes:**
+- GET/PATCH /api/users/:address - User profile management
+- GET /api/achievements - Get earned and locked achievements
+- POST /api/achievements/check - Check and award achievements
+- GET /api/leaderboard - Leaderboard with filtering (accuracy, wisdom, quests)
+
+**Achievement System:**
+- 7 achievements implemented: First Blood, Hat Trick, Sharpshooter, Quest Master, Diamond Hands, Whale, Oracle
+- Rarity levels: Common, Uncommon, Rare, Epic, Legendary
+- Achievement checking integrated into bet placement, claim, quest completion, and deposit/withdrawal flows
+- lib/achievements.ts: Achievement definitions and checking logic
+
+**Metrics & Calculations:**
+- XP system fully integrated: +10 bet, +20 win, +50 streak, +30 quest, +15 first deposit, +10 first withdrawal
+- Level formula: level = floor(sqrt(xp / 100))
+- Yield Efficiency: ((ycWon - ycSpent) / ycSpent) * 100
+- Wisdom Index: (accuracy * 0.5) + (yieldEfficiency * 0.3) + (streakBonus * 0.2)
+- User class calculation: Whale, Oracle, Analyst, Degen, Novice
+
+**UI Components:**
+- LevelBadge: Displays level with progress bar to next level
+- AchievementBadge: Shows earned/locked achievements with rarity colors
+- AchievementEarnedModal: Confetti animation for new achievements
+- Profile page: Complete with stats, achievements grid, quest history, and preferences
+- Leaderboard page: Three tabs (Accuracy, Wisdom, Quest Masters) with search and pagination
+
+**Integration:**
+- Achievement checks integrated into all XP-awarding flows
+- Metrics updated on each bet claim
+- Streak counting with reset on loss
+- First deposit/withdrawal tracking for Diamond Hands achievement

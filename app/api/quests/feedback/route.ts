@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import Anthropic from "@anthropic-ai/sdk";
+import { checkAndAwardAchievements } from "@/lib/achievements";
 
 const prisma = new PrismaClient();
 
@@ -157,18 +158,26 @@ Return this exact JSON structure:
       },
     });
 
-    // Award XP for completing a quest
+    // Award XP for completing a quest and increment completedQuests
     await prisma.user.update({
       where: { id: user.id },
       data: {
         xp: user.xp + 30, // +30 XP for completing a Claude quest
+        completedQuests: { increment: 1 },
       },
+    });
+
+    // Check achievements (for Quest Master)
+    const newAchievements = await checkAndAwardAchievements({
+      userId: user.id,
+      userAddress: address,
     });
 
     return NextResponse.json(
       {
         quest: updatedQuest,
         feedback: feedbackData,
+        newAchievements,
       },
       { status: 200 }
     );

@@ -11,19 +11,29 @@ datasource db {
 }
 
 model User {
-  id                String   @id @default(uuid())
-  address           String   @unique
-  ycBalance         Float    @default(0)
-  principal         Float    @default(0)
-  lastAccrualTime   DateTime @default(now())
-  xp                Int      @default(0)
-  level             Int      @default(1)
-  accuracy          Float    @default(0)
-  totalBets         Int      @default(0)
-  wins              Int      @default(0)
-  losses            Int      @default(0)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                String    @id @default(uuid())
+  address           String    @unique
+  ycBalance         Float     @default(0)
+  principal         Float     @default(0)
+  lastAccrualTime   DateTime  @default(now())
+  xp                Int       @default(0)
+  level             Int       @default(1)
+  accuracy          Float     @default(0)
+  totalBets         Int       @default(0)
+  wins              Int       @default(0)
+  losses            Int       @default(0)
+  streakCount       Int       @default(0)
+  ycSpent           Float     @default(0)
+  ycWon             Float     @default(0)
+  yieldEfficiency   Float     @default(0)
+  wisdomIndex       Float     @default(0)
+  showOnLeaderboard Boolean   @default(true)
+  displayName       String?
+  firstDepositAt    DateTime?
+  firstWithdrawAt   DateTime?
+  completedQuests   Int       @default(0)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   @@index([address])
 }
