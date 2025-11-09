@@ -3,6 +3,7 @@
 import { useAccount } from "wagmi";
 import { Card } from "@/components/ui";
 import { WalletButton } from "@/components/wallet/WalletButton";
+import { QuestHistory } from "@/components/quests";
 
 export default function ProfilePage() {
   const { isConnected, address } = useAccount();
@@ -25,14 +26,20 @@ export default function ProfilePage() {
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8">
-      <Card>
-        <h2 className="mb-4 text-2xl font-bold text-foreground">Profile</h2>
-        <p className="mb-2 text-sm text-foreground/70">Address: {address}</p>
-        <p className="text-sm text-foreground/70">
-          Profile features including achievements, stats, and analytics will be
-          implemented in Phase 5.
-        </p>
-      </Card>
+      <div className="space-y-6">
+        {/* Profile Header */}
+        <Card>
+          <h2 className="mb-4 text-2xl font-bold text-foreground">Profile</h2>
+          <p className="mb-2 text-sm text-foreground/70">Address: {address}</p>
+          <p className="text-sm text-foreground/70">
+            Full profile features including achievements, stats, and analytics
+            will be implemented in Phase 5.
+          </p>
+        </Card>
+
+        {/* Quest History */}
+        <QuestHistory />
+      </div>
     </div>
   );
 }
