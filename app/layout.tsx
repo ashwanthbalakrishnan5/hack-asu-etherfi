@@ -4,6 +4,7 @@ import "./globals.css";
 import { Web3Provider } from "@/components/providers/Web3Provider";
 import { ToastContainer } from "@/components/ui";
 import { Header, Footer } from "@/components/layout";
+import { CreditsWidget } from "@/components/credits";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +36,7 @@ export default function RootLayout({
             <main className="flex-1">{children}</main>
             <Footer />
           </div>
+          <CreditsWidget />
           <ToastContainer />
         </Web3Provider>
       </body>
