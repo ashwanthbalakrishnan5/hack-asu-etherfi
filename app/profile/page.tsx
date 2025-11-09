@@ -6,6 +6,8 @@ import { Card, Button } from "@/components/ui";
 import { WalletButton } from "@/components/wallet/WalletButton";
 import { LevelBadge, AchievementBadge, PortfolioAnalytics } from "@/components/profile";
 import { ACHIEVEMENT_DEFINITIONS } from "@/lib/achievements";
+import { ArrowUpFromLine, Zap } from "lucide-react";
+import { toast } from "@/lib/stores/toast";
 
 interface UserProfile {
   address: string;
@@ -50,6 +52,8 @@ export default function ProfilePage() {
   const [editMode, setEditMode] = useState(false);
   const [displayName, setDisplayName] = useState("");
   const [showOnLeaderboard, setShowOnLeaderboard] = useState(true);
+  const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
 
   useEffect(() => {
     if (isConnected && address) {
@@ -111,6 +115,42 @@ export default function ProfilePage() {
       }
     } catch (error) {
       console.error("Error saving preferences:", error);
+    }
+  }
+
+  async function handleWithdrawYC() {
+    const amount = parseFloat(withdrawAmount);
+    if (!amount || amount <= 0) {
+      toast.error("Please enter a valid amount");
+      return;
+    }
+
+    if (!profile || amount > profile.ycBalance) {
+      toast.error("Insufficient YC balance");
+      return;
+    }
+
+    setIsWithdrawing(true);
+    try {
+      const response = await fetch('/api/yc/withdraw', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address, amount }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        toast.success(`✓ Withdrawn ${amount} YC to your wallet`);
+        setWithdrawAmount("");
+        fetchProfile();
+      } else {
+        const error = await response.json();
+        toast.error(error.error || 'Withdrawal failed');
+      }
+    } catch (error) {
+      toast.error('Withdrawal failed');
+    } finally {
+      setIsWithdrawing(false);
     }
   }
 
@@ -349,6 +389,59 @@ export default function ProfilePage() {
                 {(profile.ycWon - profile.ycSpent).toFixed(2)}
               </p>
             </div>
+          </div>
+        </Card>
+
+        {/* Withdraw YC */}
+        <Card>
+          <h3 className="text-lg font-bold text-foreground mb-4">
+            Withdraw Credits
+          </h3>
+          <div className="space-y-4">
+            <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-foreground/70">Available to Withdraw</span>
+                <div className="flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-primary" />
+                  <span className="text-xl font-bold text-primary">
+                    {profile.ycBalance.toFixed(2)} YC
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <input
+                type="number"
+                value={withdrawAmount}
+                onChange={(e) => setWithdrawAmount(e.target.value)}
+                placeholder="Amount to withdraw"
+                className="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                min="0"
+                max={profile.ycBalance}
+                step="0.01"
+              />
+              <Button
+                onClick={() => setWithdrawAmount(profile.ycBalance.toString())}
+                variant="secondary"
+                size="sm"
+              >
+                Max
+              </Button>
+            </div>
+
+            <Button
+              onClick={handleWithdrawYC}
+              disabled={isWithdrawing || !withdrawAmount || parseFloat(withdrawAmount) <= 0}
+              className="w-full gap-2"
+            >
+              <ArrowUpFromLine className="w-4 h-4" />
+              {isWithdrawing ? 'Processing...' : 'Withdraw to Wallet'}
+            </Button>
+
+            <p className="text-xs text-foreground/50 text-center">
+              YC will be converted and sent to your connected wallet
+            </p>
           </div>
         </Card>
 
